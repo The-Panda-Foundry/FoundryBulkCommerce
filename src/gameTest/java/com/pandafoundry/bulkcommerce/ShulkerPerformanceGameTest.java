@@ -60,7 +60,7 @@ public final class ShulkerPerformanceGameTest {
                 }
                 String name=scenario==0?"1-full-netherite":scenario==1?"4-full-netherite":"4-full-netherite-32x";
                 if(baseline!=null)report(name,"v0.1.1",player,baseline);
-                report(name,"v0.1.2",player,current);
+                report(name,"v"+FoundryBulkCommerce.VERSION,player,current);
                 // Same canonical snapshots must remain sellable; performance sampling never applies edits or pays.
                 h.assertTrue(SophisticatedSources.collect(player,new ItemStack(Items.WHEAT)).sources().size()==number,"Benchmark does not mutate stock");
                 try { current.collect(player,new ScanBudget(64,1048576));throw new AssertionError("Scan budget accepted oversized work"); }
