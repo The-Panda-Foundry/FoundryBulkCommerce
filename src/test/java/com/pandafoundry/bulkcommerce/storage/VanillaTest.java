@@ -49,7 +49,7 @@ public final class VanillaTest {
         inventory.setItem(40, box.copy());
         check(VanillaSources.collect(inventory,template,true,registries).stream().mapToLong(SaleSource::available).sum() == 180, "offhand shulkers supported");
         check(VanillaSources.collect(inventory,template,false,registries).size() == 1, "container configuration switch");
-        check(!ItemPolicy.saleable(box) && !ItemPolicy.saleable(new ItemStack(Items.CHEST)), "nested and container template exclusion");
+        check(!ItemPolicy.saleable(box) && !ItemPolicy.saleable(new ItemStack(Items.BUNDLE)), "nested and container template exclusion");
         NonNullList<ItemStack> invalid = NonNullList.withSize(28, ItemStack.EMPTY);
         invalid.set(27, new ItemStack(Items.STONE));
         box.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(invalid));
@@ -57,6 +57,25 @@ public final class VanillaTest {
         boolean rejected = false;
         try { VanillaSources.collect(inventory,template,true,registries); } catch (IllegalStateException expected) { rejected = true; }
         check(rejected, "oversized vanilla layout cannot be truncated");
+        check(ItemPolicy.saleable(new ItemStack(Items.OAK_SIGN)) && ItemPolicy.saleable(new ItemStack(Items.ENCHANTING_TABLE)), "M1 ordinary block entity items retain eligibility");
+        // Test the actual item persistence codec, not only the live component representation.
+        inventory.setItem(1, ItemStack.EMPTY); inventory.setItem(40, ItemStack.EMPTY);
+        ItemStack persistedBox = new ItemStack(Items.RED_SHULKER_BOX);
+        persistedBox.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(contents));
+        inventory.setItem(1, persistedBox);
+        var persistenceEdit = VanillaSources.collect(inventory, template, true, registries).get(1).remove(20);
+        persistenceEdit.apply();
+        var restored = ItemStack.parseOptional(registries, (net.minecraft.nbt.CompoundTag)inventory.getItem(1).saveOptional(registries));
+        check(ItemStack.matches(restored, inventory.getItem(1)), "vanilla item serialization roundtrip preserves exact after-image");
+        check(restored.get(DataComponents.CONTAINER).getStackInSlot(0).getCount() == 44, "reloaded shulker retains reduced count");
+        boolean byteLimited = false;
+        try { new ScanBudget(100, 1).nbt((net.minecraft.nbt.CompoundTag)restored.saveOptional(registries)); }
+        catch (IllegalStateException expected) { byteLimited = true; }
+        check(byteLimited, "M2 byte budget rejects oversized source evidence");
+        boolean slotLimited = false;
+        try { ScanBudget budget = new ScanBudget(1, 1000); budget.slot(); budget.slot(); }
+        catch (IllegalStateException expected) { slotLimited = true; }
+        check(slotLimited, "M2 slot budget bounds inspections");
         System.out.println("Vanilla adapter: "+checks+" checks passed");
     }
 }

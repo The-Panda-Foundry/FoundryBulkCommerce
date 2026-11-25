@@ -1,56 +1,63 @@
-# Architecture and compatibility decisions
+# MVP architecture
 
-Recorded 25 November 2026.
+Recorded **25 November 2026**. Approved scope: local SQLite journal, verified shulker selling, conservative recovery and read-only audits. MongoDB, outbox workers, distributed coordination and automatic reconciliation are not implemented. The historical proposal is retained separately in FUTURE_HYBRID_ARCHITECTURE.md.
 
-## Ownership boundaries
+## Authority and execution
 
-Treasury remains the authority for shop access, mode, template, lot size and price. Numismatics owns the seller's player account. Vanilla owns inventory/component persistence; Sophisticated Storage owns canonical shulker SavedData. Bulk Commerce coordinates a bounded, synchronous Sell All operation across those owners.
+| Stage | Authority | Action |
+| --- | --- | --- |
+| Capture, before intent acknowledgement | Live Treasury/shop, player inventory, Sophisticated canonical data, Numismatics account | Snapshot on server thread; no economic mutation authorised |
+| Durable PREPARED | SQLite authorises one attempt; live game state still owns resources | Resume on server thread; revalidate before mutation |
+| Apply/compensate | Actual verified in-memory resource states | Remove and verify every edit, then credit and verify; no yielding or SQL |
+| Durable outcome | SQLite records observations, not cross-mod save confirmation | Release global admission and report result |
+| Unclean restart or uncertain outcome | Local journal plus recovered resource data | Persistent breaker; manual investigation; never last-write-wins/replay |
 
-No user-supplied item identifiers, quantities or prices are trusted. The request's position is already checked by Treasury; the addon re-reads the block entity and its configuration. No new command or alternate unguarded sale entry point is registered.
+A random UUID identifies each transaction globally; stable instance ID and per-start boot UUID identify its origin. No remote service participates. One active transaction globally avoids overlapping addon plans without a resource-lock framework. Other mod activity can happen while the writer runs, so continuation rechecks: active ID, ledger generation, connected player object, dimension, 30-second expiry, addon enabled, module/proximity/block identity/configured BUY mode, same shop object/template/price/lot, configured quantity limit, same account object/both balances and exact source images. Sophisticated edits recheck carried UUID uniqueness and original outer stack object. Stale preparation is recorded CANCELLED without economic mutation.
 
-## Treasury Mixin
+The worker receives only immutable IDs, numbers and serialized strings. No worker reads inventories, wrappers or accounts. Database callbacks schedule server-thread continuations. Shutdown can drop a callback; PREPARED remains a recovery obligation. No tick scanning, background inventory scanning or persistent count cache exists.
 
-`TreasurySellAllMixin` targets the private static method:
+## Local schema and durability
 
-```text
-dev.yassou.numismaticstreasury.network.ServerActionHandler
-tradeShop(ServerPlayer, JsonObject, boolean): void
-```
+`<world>/data/foundrybulkcommerce/ledger.sqlite`, schema `PRAGMA user_version=1`:
 
-It injects immediately before ordinal **0** of:
+| Table | Contents |
+| --- | --- |
+| `metadata` | Stable instance ID, boot ID, clean-stop marker, breaker and reason |
+| `transactions` | UUID primary key; instance/boot; timestamp; player UUID/name; quantity/payment; state; recovery flag; full intent/outcome JSON; SHA-256 of intent |
+| `reconciliations` | UUID, linked transaction ID, timestamp, operator, decision/evidence notes; reserved for explicit offline manual entries |
 
-```text
-InventoryUtil.countMatching(Player, ItemStack): int
-```
+Indexes cover time, player/time and recovery/state. JSON includes schema/addon versions, shop dimension/position/template/price/lot, both original balance fields and source before/after images (item or canonical SNBT). Outcomes include observed balances and source matches. SHA-256 detects accidental payload disagreement; it is not tamper-proof authentication. UUIDs and schema-versioned JSON can be exported later without shipping MongoDB machinery now.
 
-In the supplied JAR that invocation is evaluated only for Sell All, after checking the serverShop module, player proximity, expected server-shop block identity, the shop block entity, configured status and BUY_FROM_PLAYER mode. The original `near` threshold is therefore retained without reimplementing it. The hook also checks `sellAll`. It cancels before executing the replacement transaction; addon failures never fall through into Treasury's original payment branch. `enabled=false` leaves the original method untouched.
+One platform-thread executor, queue capacity 64, owns the connection. WAL, `synchronous=FULL`, busy timeout 2,500 ms, integrity quick-check and exclusive process lock are established before readiness. All SQL/file hash/commit operations run there. Queue rejection never authorises mutation. Local filesystem and host durability guarantees still matter; FULL cannot rescue failed hardware. SQLite's default WAL autocheckpoint remains in use, on the writer. There is no custom checkpoint or retention worker.
 
-The original loose-item comparison is `ItemStack.isSameItemSameComponents`; the addon uses that same comparison for all supported commodities. It does not use tags, names, fuzzy NBT matching or registry identity alone. Complete lots and original price-per-lot are retained. The original count limit is replaced by the bounded addon configuration for this branch only.
+A normal sale needs two durable transaction commits: PREPARED and outcome. No ARMED stage is needed for this conservative MVP: PREPARED itself means effects may have been attempted if no outcome survived. Intent commit uncertainty means no mutations are attempted; an outcome acknowledgement failure after mutation quarantines the server. No retries perform economic mutations. The global active flag persists until outcome acknowledgement or containment.
 
-The original manual sell path ignores `removeMatching`'s return value. Globally mixing into InventoryUtil would affect auctions/player shops without their own transactional integration, so that approach was deliberately avoided.
+States: PREPARED, CANCELLED, APPLIED_MEMORY, ROLLED_BACK_MEMORY, RECOVERY_REQUIRED. CANCELLED establishes no economic attempt. Other outcomes describe memory observations. RECOVERY_REQUIRED persists its recovery flag and breaker in the same SQL commit. Failed IO sets the in-memory blocker immediately and best-effort persists it; a surviving PREPARED or dirty-boot marker provides recovery evidence if the later breaker write fails.
 
-The inspected client `ServerShopScreen.initCustomer` creates an active Sell All button independent of loose inventory count. Its `sellAll` sends the existing `shop_sell_all` action and position. The addon needs no client screen hook, custom packet, asset or registry entry. It is enabled only on dedicated servers; integrated singleplayer is outside this version's scope.
+On startup, a previous boot without clean-stop confirmation flags its PREPARED/APPLIED_MEMORY/ROLLED_BACK_MEMORY/RECOVERY_REQUIRED records for manual review. Any PREPARED or recovery-flagged row, or stored breaker, keeps admission closed. A later clean empty boot cannot erase these flags. Cancelled preparations alone do not require resource reconciliation.
 
-## Numismatics accessor Mixin
+Only normal server-loop exit plus a returned stopServer save sequence, no active transaction, no emergency and no pending/recovery row permits a clean-stop marker. Crash-finally ServerStoppedEvent alone is insufficient. The non-daemon worker closes asynchronously after the lifecycle event. This is conservative operational containment, not independently verified fsync for every game's files. Clean-shutdown save failures hidden by another mod, inconsistent external restores, and power loss after separately persisted resources remain risks.
 
-`BankAccountAccessor` targets private fields `balance:I` and `additionalBalance:J`, exposing paired readers/writers. `BankService.account(player)` resolves the ordinary player account before committing. Successful payment uses Treasury's `BankService.credit(UUID, int)`, which calls Numismatics `deposit(int)`.
+## Settlement and compensation
 
-Both balance fields are required: Numismatics caps its visible balance at **1,073,741,823** and stores more funds separately. Verifying only `getBalance()` could incorrectly report a valid payment as missing. Checked long arithmetic prevents overflow before payment. Restoration sets both captured values and calls `markDirty()`; `setBalance()` alone would move funds between the two fields and would not restore the exact snapshot. The account object identity is also checked; a replacement account is treated as an unresolved recovery rather than silently overwritten.
+The synchronous coordinator registers an edit as attempted before writing. It checks each full after-image immediately, rechecks all edits, then credits through Treasury BankService and checks exact combined balance. A failure after possible credit restores and verifies the wallet first. Only after that verification are attempted item edits restored in reverse order and checked. Uncertain wallet compensation leaves items removed; uncertain item rollback issues no new payment. Either requires manual reconciliation. A refresh/UI exception never reverses a settled sale.
 
-Both Mixins use `remap=false`: the mod methods/fields are not obfuscated Minecraft targets. All Minecraft descriptors are the 1.21.1 Mojang names used by NeoForge. No refmap is needed for these targets. The Mixin config is required and its injection has `require=1`; incompatible target changes should fail at startup instead of silently losing the integrity hook. Metadata pins the inspected mod versions; build-time fingerprints pin the original reference bytes.
+Numismatics has `balance:int` capped at 1,073,741,823 plus `additionalBalance:long`. Both fields and account identity are captured. Payout multiplication and combined totals use exact checked arithmetic. Compensation restores both exact fields and marks the account dirty, avoiding setBalance's overflow redistribution semantics.
 
-## Transaction phases
+## Mixins and compatibility
 
-1. Collect eligible source snapshots on the server thread. No wrappers/UUIDs are allocated and no live inventory is changed while planning.
-2. Calculate the bounded quantity, rounding down to whole lots, and check payout/account arithmetic.
-3. Prepare independent before/after edits on copies. A shulker's unrelated items, names, colors and components are preserved.
-4. Revalidate every selected source and the account.
-5. Register each edit as attempted **before** calling its write, then compare the full resulting source against the planned after-image.
-6. Verify all edited sources again, then credit the account and verify its exact total.
-7. On failure, compensate attempted payment first. Only after confirming that compensation, restore attempted item edits in reverse order and verify the snapshots.
-8. Refresh inventory/shop views outside settlement; a screen refresh failure never reverses a completed sale.
+| Mixin | Target / reason |
+| --- | --- |
+| TreasurySellAllMixin | `ServerActionHandler.tradeShop(ServerPlayer, JsonObject, boolean)` before ordinal 0 `InventoryUtil.countMatching(Player, ItemStack):int`; only validated Sell All; cancel original branch before addon call |
+| BankAccountAccessor | Numismatics private `balance:I` and `additionalBalance:J` readers/writers for exact verification and compensation |
+| PlayerAdmissionMixin | `PlayerList.canPlayerLogin(SocketAddress,GameProfile)` HEAD; deny admission until ready or during containment |
+| ServerShutdownMixin | `MinecraftServer.runServer` after handleServerStopping for normal exit; `stopServer` RETURN for save-sequence completion |
 
-Repeated/replayed requests must remove another real set of items to receive another payment. The per-request limit can leave additional eligible stock for subsequent clicks. No request-count estimate is reused between requests.
+Mixin config is required and server-scoped; injections require one target. All use Mojang/mod runtime names with `remap=false`. Target incompatibility must fail rather than silently run an unprotected branch. Treasury's injection follows its module, distance, shop/block/config/mode checks; these checks are repeated after asynchronous intent persistence. Original exact `isSameItemSameComponents`, lot size and price remain authoritative. Disabled addon refuses Sell All. Other Treasury actions are not rewritten or made transactional by this addon.
+
+Metadata pins reference versions, compileJava hashes all four supplied JARs, and asynchronous startup hashes the runtime Treasury/Numismatics files and installed Sophisticated pair before allowing players. See VERIFICATION.md for hashes. Hashing installed files rather than version strings addresses same-version rebuilds. Third-party transformations are not fingerprinted; test the full modpack. NeoForge/GameTest proved current injection application, not compatibility with all other Mixins.
+
+No custom packets, registries, client assets or screen hooks. Treasury's Sell All button already sends the supported action without requiring loose inventory stock. Dedicated-server @Mod and server Mixin list keep addon code off clients; absent-addon real-client handshake remains an acceptance test. Sophisticated classes are reached only behind mod-presence checks. SQLite 3.51.3.0 is exact-version Jar-in-Jar; the development runs additionally require ModDevGradle additionalRuntimeClasspath, per its official documentation. Native JDBC loading was verified on this Mac; staging Linux architecture/native temp permissions need verification.
 
 ## Vanilla adapter
 
@@ -85,16 +92,12 @@ Before scanning supported shulkers, the adapter examines modern UUID components 
 
 The full outer shulker stack and canonical compound must match the snapshot before writing, and the full canonical after-image must be observed before payment. `setStorageContents` marks SavedData dirty. An already existing StackStorageWrapper for the actual source stack is invalidated using `onContentsNbtUpdated()`; the addon never adds a wrapper cache entry or clears the global repository. Other aliases cannot obtain payment from an old snapshot: the addon always re-reads canonical data; Sophisticated's fromStack also reloads its canonical record.
 
-## Failure and recovery limits
+## Containment, performance and limitations
 
-Ordinary RuntimeExceptions in writes or payment are compensated synchronously. The transaction coordinator's injected-failure tests cover a write that throws after partial change, silent failed writes, failure before and after credit, missing credit, stale plans, failed payment compensation and failed item rollback.
+The admission gate blocks all players while starting or recovering. Any live ledger/settlement emergency disconnects all players and denies re-entry, because a bulk-only pause would allow uncertain funds through other mods. The console remains available. No in-game breaker-reset, correction or refund command exists. See RECOVERY.md for offline handling.
 
-An uncertain account compensation never returns items. An uncertain item rollback never issues a payment. Either sets a global emergency circuit breaker for addon Sell All. The log contains `RECONCILE <UUID>` records with the player, planned quantity/payment, original and current balances and before/after source data. Loose/vanilla before-images use registry-aware item SNBT; Sophisticated records use canonical SNBT plus their UUID/slot. These records can be large and should be retained with the server logs.
+Planning has a global 250 ms default admission interval, one active request, per-request slot/NBT/intent budgets, 256 Sophisticated inventory slots and at most 16 upgrade entries per source. Oversized requests abort before intent/mutation. Source processing is proportional to slots rather than total item count. Budgets also apply when no sale is possible; repeated failed attempts cannot bypass the cooldown. Busy notices are globally throttled to once/second.
 
-For recovery: stop player activity on staging, preserve logs and a consistent copy of all affected world/player/bank data, compare the actual item state with both images and compare both account balance fields, then reconcile once. Prefer restoring one consistent pre-test backup when the outcome cannot be established. Do not blindly refund items or deposit money, and do not repeatedly replay the sale. Do not clear the pause by restarting until reconciliation is complete. Disabling the addon delegates to Treasury's original Sell All and is not a recovery procedure.
+NBT encoding, component decoding, full-image comparisons and serialisation still run on the server thread. A byte cap bounds accepted/scanned data, not the worst-case cost of an arbitrary third-party component codec. Moderator SQL queries are bounded to 25 summaries; inspect can read one capped intent and paginate it. No load benchmark was performed. Status reads only volatile memory. Disk space, WAL growth, journal latency and server MSPT require host monitoring; there is no statistics framework or automatic archival.
 
-There is no cross-file fsync/atomic-save guarantee, write-ahead journal, process-crash replay or protection against arbitrary third-party mods rewriting inventory/bank state off the server thread. Fatal JVM errors, disk failures and power loss are outside the recoverable RuntimeException model. This limitation is explicit; a stronger durability guarantee would require a separate persistence design and acceptance review.
-
-## Performance
-
-No tick/event scanning or count cache. A request scans at most the vanilla inventory slots and at most 256 entries per supported shulker, plus a maximum 16 upgrade entries. Duplicate UUID detection is local to that request. Counts use long arithmetic; removal/payment use checked positive ints. A single compound write replaces a supported canonical shulker record rather than looping normal-stack extractions. Staging profiling must include many full boxes and large component payloads; a quantity limit does not itself bound the byte size of existing item components.
+Cross-player UUID aliases are not globally scanned. Canonical data is re-read on each sale and full snapshots revalidated, preventing two addon sales from paying for one removal. The addon does not repair aliases or third-party cached-wrapper behaviour outside its supported caller. Arbitrary async third-party mutations, malicious extensions, fatal JVM errors, storage failure and independent world/bank restores exceed the synchronous compensation model. Conservative startup quarantine reduces exposure but does not turn separate resource persistence into one atomic transaction.

@@ -3,6 +3,13 @@
   "minVersion": "0.8.7",
   "package": "com.pandafoundry.bulkcommerce.mixin",
   "compatibilityLevel": "JAVA_21",
-  "server": ["TreasurySellAllMixin", "BankAccountAccessor"],
-  "injectors": { "defaultRequire": 1 }
+  "server": [
+    "TreasurySellAllMixin",
+    "BankAccountAccessor",
+    "PlayerAdmissionMixin",
+    "ServerShutdownMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
 }

@@ -9,19 +9,43 @@ java {
     toolchain.languageVersion = JavaLanguageVersion.of(21)
     withSourcesJar()
 }
+sourceSets { gameTest {} }
+sourceSets.gameTest.compileClasspath += sourceSets.main.output
+sourceSets.gameTest.runtimeClasspath += sourceSets.main.output
+configurations.gameTestImplementation.extendsFrom(configurations.implementation)
+configurations.gameTestCompileOnly.extendsFrom(configurations.compileOnly)
+configurations.gameTestRuntimeOnly.extendsFrom(configurations.runtimeOnly)
+
 neoForge {
     version = '21.1.265'
     addModdingDependenciesTo(sourceSets.test)
+    addModdingDependenciesTo(sourceSets.gameTest)
     runs {
         server { server(); programArgument '--nogui' }
+        gameTestServer {
+            type = 'gameTestServer'
+            sourceSet = sourceSets.gameTest
+            systemProperty 'neoforge.enabledGameTestNamespaces', 'foundrybulkcommerce'
+            gameDirectory = file('run-gametest')
+        }
     }
-    mods { foundrybulkcommerce { sourceSet sourceSets.main } }
+    mods { foundrybulkcommerce { sourceSet sourceSets.main; sourceSet sourceSets.gameTest } }
 }
+repositories { mavenCentral() }
+
 def dependencyDirectory = providers.gradleProperty('dependencyDir').orElse('dependencies')
 dependencies {
+    additionalRuntimeClasspath('org.xerial:sqlite-jdbc:3.51.3.0') { transitive = false }
+    jarJar(implementation('org.xerial:sqlite-jdbc:3.51.3.0')) {
+        version { strictly '[3.51.3.0]'; prefer '3.51.3.0' }
+        transitive = false
+    }
     compileOnly fileTree(dir: dependencyDirectory.get(), include: ['*.jar'])
     testImplementation fileTree(dir: dependencyDirectory.get(), include: ['*.jar'])
-    localRuntime fileTree(dir: dependencyDirectory.get(), include: ['*.jar'])
+    runtimeOnly fileTree(dir: dependencyDirectory.get(), include: ['*.jar'])
+    if (providers.gradleProperty('createJar').isPresent()) {
+        gameTestImplementation files(providers.gradleProperty('createJar').get())
+    }
 }
 tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8'; options.release = 21 }
 tasks.withType(AbstractArchiveTask).configureEach {
@@ -82,3 +106,13 @@ tasks.named('compileJava') { dependsOn 'verifyCompatibilityReferences' }
 tasks.named('jar') {
     manifest.attributes('FMLModType': 'MOD', 'Implementation-Title': 'Foundry Bulk Commerce', 'Implementation-Version': project.version)
 }
+
+tasks.register('ledgerTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.pandafoundry.bulkcommerce.ledger.LedgerTest'
+}
+tasks.named('check') { dependsOn 'ledgerTest' }
+
+// The suites are executable Java harnesses registered above, not JUnit classes.
+tasks.named('test') { failOnNoDiscoveredTests = false }

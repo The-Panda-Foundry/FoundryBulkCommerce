@@ -32,12 +32,16 @@ public final class SophisticatedSources {
 
     public record Collected(List<SaleSource> sources, int skipped) {}
     public static Collected collect(ServerPlayer player, ItemStack template) {
+        return collect(player, template, new ScanBudget(32768, 4194304));
+    }
+    public static Collected collect(ServerPlayer player, ItemStack template, ScanBudget budget) {
         if (Thread.currentThread().getThreadGroup() != SidedThreadGroups.SERVER)
             throw new IllegalStateException("Canonical Sophisticated storage requires the server thread group");
         var inventory = player.getInventory();
         List<UUID> identities = new ArrayList<>();
         // Include all carried identities, even unsupported containers; never count a UUID twice.
         for (int i = 0; i < inventory.getContainerSize(); i++) {
+            budget.slot();
             UUID uuid = inventory.getItem(i).get(ModCoreDataComponents.STORAGE_UUID);
             if (uuid != null) identities.add(uuid);
         }
@@ -45,6 +49,7 @@ public final class SophisticatedSources {
         List<SaleSource> sources = new ArrayList<>();
         int skipped = 0;
         for (int i = 0; i < inventory.getContainerSize(); i++) {
+            budget.slot();
             ItemStack stack = inventory.getItem(i);
             if (!(stack.getItem() instanceof ShulkerBoxItem)) continue;
             UUID uuid = stack.get(ModCoreDataComponents.STORAGE_UUID);
@@ -55,12 +60,15 @@ public final class SophisticatedSources {
             }
             if (uuid == null) continue; // New empty boxes have no canonical contents; do not allocate storage.
             if (duplicateIdentities.contains(uuid)) { skipped++; continue; }
-            CompoundTag root = ItemContentsStorage.get().getStorageContents(uuid).map(CompoundTag::copy).orElse(null);
-            if (root == null || !supported(player.registryAccess(), root)) { skipped++; continue; }
+            CompoundTag root = ItemContentsStorage.get().getStorageContents(uuid).orElse(null);
+            if (root != null) budget.nbt(root);
+            if (root == null || !supported(player.registryAccess(), root, budget)) { skipped++; continue; }
+            root = root.copy();
             CompoundTag storedInventory = root.getCompound("storageWrapper").getCompound("contents").getCompound("inventory");
             ListTag items = storedInventory.getList("Items", Tag.TAG_COMPOUND);
             long matching = 0;
             for (int n = 0; n < items.size(); n++) {
+                budget.slot();
                 ItemStack item = decode(player.registryAccess(), items.getCompound(n));
                 if (ItemPolicy.saleable(item) && ItemStack.isSameItemSameComponents(item, template)) matching += item.getCount();
             }
@@ -88,6 +96,9 @@ public final class SophisticatedSources {
     }
 
     static boolean supported(Provider registries, CompoundTag root) {
+        return supported(registries, root, new ScanBudget(32768, 4194304));
+    }
+    private static boolean supported(Provider registries, CompoundTag root, ScanBudget budget) {
         if (!root.contains("storageWrapper", Tag.TAG_COMPOUND)) return false;
         CompoundTag contents = root.getCompound("storageWrapper").getCompound("contents");
         if (!contents.contains("inventory", Tag.TAG_COMPOUND)) return false;
@@ -98,6 +109,7 @@ public final class SophisticatedSources {
         if (items.size() != ((ListTag)inventory.get("Items")).size() || items.size() > size) return false;
         Set<Integer> slots = new HashSet<>();
         for (int n = 0; n < items.size(); n++) {
+            budget.slot();
             CompoundTag itemTag = items.getCompound(n);
             if (!itemTag.contains("Slot", Tag.TAG_INT) || !itemTag.contains("id", Tag.TAG_STRING)) return false;
             int slot = itemTag.getInt("Slot");
@@ -115,6 +127,7 @@ public final class SophisticatedSources {
             ListTag upgradeItems = upgrades.getList("Items", Tag.TAG_COMPOUND);
             if (upgradeItems.size() != ((ListTag)upgrades.get("Items")).size() || upgradeItems.size() > 16) return false;
             for (int n = 0; n < upgradeItems.size(); n++) {
+                budget.slot();
                 ItemStack upgrade = decode(registries, upgradeItems.getCompound(n));
                 var id = BuiltInRegistries.ITEM.getKey(upgrade.getItem());
                 if (!(upgrade.getItem() instanceof StackUpgradeItem) || !id.getNamespace().equals("sophisticatedstorage")
@@ -151,7 +164,15 @@ public final class SophisticatedSources {
             CompoundTag after = removeContents(player.registryAccess(), before, template, amount);
             ItemStack outerSnapshot = reference.copy();
             return new Transaction.Edit() {
-                private boolean outerUnchanged() { return ItemStack.matches(player.getInventory().getItem(slot), outerSnapshot); }
+                private boolean outerUnchanged() {
+                    if (player.getInventory().getItem(slot) != reference || !ItemStack.matches(reference, outerSnapshot)) return false;
+                    // A carried alias may have appeared while the durable intent was being written.
+                    int occurrences = 0;
+                    for (int i = 0; i < player.getInventory().getContainerSize(); i++)
+                        if (uuid.equals(player.getInventory().getItem(i).get(ModCoreDataComponents.STORAGE_UUID)) && ++occurrences > 1)
+                            return false;
+                    return occurrences == 1;
+                }
                 private boolean matches(CompoundTag expected) {
                     return outerUnchanged() && ItemContentsStorage.get().getStorageContents(uuid).filter(expected::equals).isPresent();
                 }

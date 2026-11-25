@@ -1,7 +1,6 @@
 package com.pandafoundry.bulkcommerce.mixin;
 
 import com.google.gson.JsonObject;
-import com.pandafoundry.bulkcommerce.BulkConfig;
 import com.pandafoundry.bulkcommerce.BulkSales;
 import dev.yassou.numismaticstreasury.network.ServerActionHandler;
 import net.minecraft.server.level.ServerPlayer;
@@ -17,7 +16,7 @@ public abstract class TreasurySellAllMixin {
         at = @At(value = "INVOKE", target = "Ldev/yassou/numismaticstreasury/server/InventoryUtil;countMatching(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/item/ItemStack;)I", ordinal = 0),
         cancellable = true, require = 1, expect = 1)
     private static void foundry$sellAll(ServerPlayer player, JsonObject data, boolean sellAll, CallbackInfo ci) {
-        if (!sellAll || !BulkConfig.ENABLED.get()) return;
+        if (!sellAll) return;
         ci.cancel(); // Never fall back to an unverified payment after an addon failure.
         BulkSales.sell(player, data);
     }

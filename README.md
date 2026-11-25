@@ -1,95 +1,99 @@
 # Foundry: Bulk Commerce
 
-Version **0.1.0**, prepared **25 November 2026**. Minecraft **1.21.1**, NeoForge, Java **21**.
+**0.1.0 MVP staging candidate — 25 November 2026.** Minecraft 1.21.1, dedicated NeoForge server, Java 21. Standard Gradle build and a real NeoForge GameTest have passed. Real-player acceptance in the complete server modpack is still required. Nothing has been deployed to production.
 
-**Staging candidate.** The source compiles and the offline tests pass. A full dedicated-server launch with these mods and a live Mixin application has **not** been performed. Acceptance testing is required before considering production use.
+Extends **Numismatics Treasury's existing server-shop Sell All** to matching items in carried vanilla and supported Sophisticated Storage shulkers. Treasury retains shop prices, complete lots, access checks and exact item/component matching. Only Sell All is replaced; manual sales, purchases, auctions and transfers retain their original implementation.
 
-Foundry: Bulk Commerce extends **Numismatics Treasury's server-shop Sell All button** to sell matching items from carried vanilla and supported Sophisticated Storage shulker boxes. Shop configuration, prices, complete lot sizes, Treasury's access checks and exact item/component matching remain authoritative.
+Carry your items/boxes, open a BUY_FROM_PLAYER server shop and click Sell All. Each request sells complete lots up to the configured item limit. Preparation and outcome acknowledgement are asynchronous; wait for the transaction reference/result before retrying. Clients need their normal modpack but no Bulk Commerce installation. Integrated singleplayer is outside this version's scope.
 
-## Usage
+## Supported sources
 
-Carry the items/shulkers, open a Treasury server shop in **BUY_FROM_PLAYER** mode and confirm **Sell All**. One request sells complete lots up to the configured item limit. Repeat the action for additional batches. The addon uses the existing Treasury action payload and screen: clients need Treasury and its normal dependencies, but do not need Bulk Commerce.
-
-Only the existing **Sell All** path is extended. Manual quantity sales, purchases, player shops, auctions and bank transfers remain Treasury's original implementations. This addon does not repair transaction handling in those other paths.
-
-## Supported storage
-
-| Source | Initial support |
+| Source | Support |
 | --- | --- |
-| Loose main-inventory/hotbar items | Yes; same slots and component comparison as Treasury |
-| Vanilla shulker boxes | Main inventory, hotbar or offhand; exactly one box per source |
-| Sophisticated Storage shulkers | Canonical modern UUID-backed, finite storage; up to 256 inventory slots |
-| Sophisticated stack upgrades | Standard tiers 1, 1+, 2–5 and omega, including oversized integer counts |
-| Other Sophisticated upgrades | Excluded conservatively, even if disabled |
-| Nested containers | Not traversed; container items are excluded as sale candidates |
-| Backpacks, linked/ender storage, placed containers | Excluded |
-| Armor/offhand loose items, Curios and other mod inventories | Not sold; only carried shulker items in vanilla inventory slots are considered |
+| Loose main inventory/hotbar | Same slots and comparison as Treasury |
+| Vanilla shulkers | Vanilla inventory, including offhand; one box per slot |
+| Sophisticated Storage shulkers | Modern UUID-backed canonical finite storage; at most 256 slots |
+| Stack upgrades | Standard tiers 1, 1+, 2–5 and omega; oversized positive integer counts |
+| Other upgrades/partitions | Excluded, including disabled non-stack upgrades and infinite/creative partitions |
+| Linked storage, backpacks, placed containers | Excluded |
+| Nested containers | Never traversed or sold as commodities |
+| Loose offhand/armor, Curios, other inventories | Not sold |
 
-Duplicate carried storage UUIDs exclude **every** matching alias from that request. Canonical contents are re-read and compared before any commit; the addon never pays from a cached item-count estimate.
+Every carried alias of a duplicate storage UUID is excluded. UUID uniqueness is checked again before mutation. Legacy embedded Sophisticated storage is skipped rather than migrated. Sale templates with container/bundle/block-entity data, storage identities, backpack names, or items that cannot fit inside containers are excluded. Ordinary signs and enchanting tables are supported; block-entity block types alone are no longer rejected.
 
-The initial sale scope is ordinary commodities. Items with container/bundle/block-entity components, block-entity block items, items that disallow container nesting, Sophisticated items and backpack-named items are rejected as sale templates/candidates. This intentionally excludes some non-container block-entity items too. It avoids destroying hidden contents; unsupported items can still be handled through Treasury's unchanged manual sale path, subject to Treasury's own behaviour.
+## Build
 
-## Dependencies and building
+Use Java 21 and the included Gradle 9.2.1 wrapper. ModDevGradle 2.0.148 targets NeoForge **21.1.265**. Minimum metadata version 21.1.242 is not a claim of testing every loader version.
 
-Authoritative compatibility references (not bundled):
+Place the original four JARs in `dependencies/`, with these names:
 
-| Mod | Reference version |
-| --- | --- |
-| Numismatics Treasury | 1.0.2 |
-| Create: Numismatics | 1.1.0+neoforge-mc1.21.1 |
-| Sophisticated Storage | File build 1.6.2.2159; metadata version 1.6.2 |
-| Sophisticated Core | File build 1.5.7.2381; metadata version 1.5.7 |
-
-NeoForge **21.1.265** is the pinned build target. Declared minimum **21.1.242** follows Treasury; other loader builds need staging verification. Numismatics also requires **Create 6.0.10 to below 6.1.0**, with Create's normal dependencies. Sophisticated Storage/Core are optional at runtime but their supplied JARs are required for this source project's compilation and compatibility checks. Optional installed versions are constrained to the inspected metadata versions. File-build SHA-256 pins provide the stricter build-time reference check.
-
-Place your own four reference JARs in `dependencies/`, retaining their original filenames. Nothing from that directory is committed or distributed. Java 21, Gradle wrapper 9.2.1 and ModDevGradle 2.0.148 are configured.
+- `CreateNumismatics-1.1.0+neoforge-mc1.21.1.jar`
+- `numismatics_treasury-1.0.2.jar`
+- `sophisticatedcore-1.21.1-1.5.7.2381.jar`
+- `sophisticatedstorage-1.21.1-1.6.2.2159.jar`
 
 ```sh
 export JAVA_HOME=$(/usr/libexec/java_home -v 21)
-./gradlew --offline build
-```
-
-Use `./gradlew build` if the required Gradle, plugin or NeoForge inputs are not already cached and network access is available. The Gradle build includes hash verification and the four executable test suites. The Gradle build itself has not been validated in the task sandbox: Gradle was blocked before project configuration when creating its local file-lock socket.
-
-To keep dependencies at another path:
-
-```sh
+./gradlew build
+# Existing populated cache:
 ./gradlew --offline -PdependencyDir=/absolute/path/to/dependencies build
 ```
 
-An offline fallback compiles using Java 21 and an existing **prepared NeoForge 21.1.265** cache, resolves exact libraries from the cached Minecraft manifest and NeoForge userdev configuration, runs the checks and packages only addon classes/resources:
+`build` runs reference hashes, compilation and five executable regression suites through `check`. Gradle's JUnit discovery task has no JUnit tests; the named JavaExec suites are the tests. Output: `build/libs/foundrybulkcommerce-0.1.0.jar` and `-sources.jar`. Original dependency JARs are excluded from Git and distribution. SQLite JDBC **3.51.3.0** is bundled through NeoForge Jar-in-Jar; see THIRD_PARTY_NOTICES.md. No MongoDB dependency is added.
+
+Runtime requires Treasury 1.0.2, Numismatics 1.1.0 and Create 6.0.10–below 6.1.0 with its normal dependencies. Sophisticated Storage/Core are optional at runtime, required for source compilation/reference checks. Exact supplied reference bytes are checked at startup before admitting players (including the Sophisticated pair when installed). Unexpected builds fail closed even when their metadata version is identical.
+
+For the disposable runtime integration test, also supply your own Create JAR:
 
 ```sh
-python3 scripts/build_offline.py --dependencies /absolute/path/to/dependencies
+./gradlew -PcreateJar=/absolute/path/to/create-1.21.1-6.0.10.jar runGameTestServer
 ```
 
-Pass `--java-home` and `--gradle-home` when needed. The helper reads but never changes the original caches or dependency JARs. It requires the already prepared merged classes; it cannot replace a missing NeoForge setup. Its classpath includes the cached Minecraft client archive only to supply bootstrap resources to item tests. No Minecraft or dependency classes/resources are included in the addon.
+Read the game test result log: a successful Gradle exit alone does not prove Minecraft loaded successfully. The test uses a disposable `run-gametest/` world, actual mods and actual Mixins. Do not point development runs at production data. The obsolete hand-packaging fallback was removed; Gradle is the supported build process. Environment-specific offline cache provisioning is documented in docs/VERIFICATION.md.
 
-The resulting files are `build/libs/foundrybulkcommerce-0.1.0.jar`, `build/libs/foundrybulkcommerce-0.1.0-sources.jar` and `build/verification.json`. `scripts/build_offline.py` creates deterministic archives.
+## Configuration
 
-## Server configuration
+NeoForge generates `<world>/serverconfig/foundrybulkcommerce-server.toml`. Restart after edits for repeatable staging tests.
 
-NeoForge writes `<world>/serverconfig/foundrybulkcommerce-server.toml`. The first run supplies defaults; use `defaultconfigs/` for defaults in new worlds if desired. The options are read per request. Restart the staging server after edits for a repeatable acceptance test.
-
-| Option | Default | Meaning |
+| Key | Default | Range/meaning |
 | --- | --- | --- |
-| `enabled` | `true` | Enable the addon Sell All transaction path; false restores Treasury's original path |
-| `vanillaShulkers` | `true` | Include carried vanilla shulker contents |
-| `sophisticatedShulkers` | `true` | Include the supported Sophisticated adapter when both mods are installed |
-| `bulkTransactionLimit` | `2304` | Individual items per request, including loose items; allowed range 1–1,048,576 |
+| `enabled` | true | False **refuses Sell All**; it never bypasses the ledger |
+| `vanillaShulkers` | true | Include vanilla shulkers |
+| `sophisticatedShulkers` | true | Include supported Sophisticated sources |
+| `bulkTransactionLimit` | 2304 | Individual items including loose stock; 1–1,048,576; whole lots only |
+| `serverInstanceId` | empty | Generate/persist a UUID; or set 1–64 letters/digits/`_.:-` before first use |
+| `requestIntervalMillis` | 250 | Global admission interval; 50–60,000 ms |
+| `maxScannedSlots` | 4096 | Planning slot inspections; 64–32,768 |
+| `maxSnapshotBytes` | 1,048,576 | Scanned NBT budget and final UTF-8 intent cap, separately enforced; 16,384–4,194,304 |
 
-The limit rounds **down** to complete lots. If it is smaller than the shop's lot size, that shop cannot complete a bulk sale. Price multiplication uses checked integer arithmetic: a payout larger than a positive signed 32-bit amount is refused before mutation. Account total/overflow capacity is checked with exact long arithmetic too. The default retains Treasury's original 2304-item upper bound; raise it deliberately after performance testing.
+One transaction globally remains active through durable outcome acknowledgement. Preparations expire after 30 seconds. Prices use checked int multiplication; combined standard/reserve funds use checked long arithmetic. A limit below a shop lot results in no sale. Large component encoding is still server-thread work: byte/slot bounds and cooldowns reduce exposure but are not a hard millisecond deadline.
 
-## Integrity and performance
+Instance ID is bound to the ledger at first creation; changing it later fails closed. Give staging an independent world/ledger and distinct ID. Do not run cloned ledgers under the same identity on multiple servers.
 
-Transactions run synchronously on Treasury's existing server-thread request. Planning operates on snapshots. Before mutation, all selected sources and the account must still match. Every applied change is compared against the complete expected result, followed by a final verification of every edited source. Only then is the account credited, and both standard and overflow balances are checked.
+## Ledger and operator commands
 
-Removal or payment failures trigger compensation. A payment that might have happened is restored and verified **before** any items are returned. Item snapshots restore in reverse order. If compensation cannot be verified, bulk selling pauses for the lifetime of the dedicated-server process and logs a transaction reference, balances and source before/after data for administrator reconciliation. Do not simply restart to clear that pause: follow the recovery notes in `docs/ARCHITECTURE.md`.
+Local database: `<world>/data/foundrybulkcommerce/ledger.sqlite`, with SQLite WAL/SHM sidecars and `ledger.lock`. Use persistent **local** storage, not a shared network filesystem. A single bounded worker performs all database operations, including FULL durability commits. The Minecraft thread never waits for SQL; it revalidates shop, player, account, identities and exact source snapshots before mutation.
 
-No tick listeners, background scans, asynchronous inventory operations, addon persistent storage, new packets or persistent count caches are used. Work is limited to an explicit Sell All request, the vanilla inventory slots and supported shulkers' bounded slot lists. The only retained addon state is a server-thread reentrancy flag and an emergency circuit-breaker flag.
+OP permission level **2**, or console, can use these read-only commands:
 
-**Durability boundary:** this is a verified in-memory transaction, not a cross-file crash-atomic database transaction. Minecraft player data, Sophisticated SavedData and Numismatics balances save independently. A process/power/storage failure between writes can require restoring a consistent server backup. This version does not implement a write-ahead journal or automated crash reconciliation.
+| Command | Result |
+| --- | --- |
+| `/bulkcommerce status` | Memory-only readiness, breaker, instance and queued work |
+| `/bulkcommerce recent [limit]` | Latest 10, at most 25 |
+| `/bulkcommerce player <uuid> [limit]` | History for exact player UUID |
+| `/bulkcommerce unresolved` | Latest 25 pending/recovery records |
+| `/bulkcommerce inspect <transaction-uuid> [page]` | Summary/outcome; pages 1+ show full intent evidence |
 
-## Validation and next steps
+No refund, replay, reconciliation or breaker-reset command exists. Moderator roles without OP level 2 need a separately reviewed permission integration; do not grant OP merely for this addon. Larger investigations use an offline/read-only SQLite client.
 
-Read `docs/VERIFICATION.md` for what was actually run. Use `docs/STAGING_CHECKLIST.md` for acceptance tests with the complete mod stack, including positive tests of real stack-upgrade items, UUID alias handling and save/restart persistence. `docs/ARCHITECTURE.md` describes the two Mixins, canonical storage schema and failure model. Original dependencies and production files have not been modified or deployed.
+**Containment affects the whole server:** startup denies player login until the ledger is ready. An unresolved restart or emergency blocks all new logins. A live ledger/settlement emergency disconnects all online players, keeping uncertain funds unavailable through other mods. Console audit commands remain available when the database can be opened. A read-query failure also trips containment. Disabling/removing the addon is not a recovery procedure.
+
+## Recovery limits and operations
+
+Intent is durable before any item removal or payment. Successful extraction is verified before payment; payment and ordinary rollback are verified. Outcomes distinguish `APPLIED_MEMORY` from durable game saves. An unclean restart flags the previous boot's potentially mutating records, including apparently successful or rolled-back ones. The persistent breaker survives restarts. **No automatic replay or refund occurs.**
+
+The ledger cannot make Minecraft player files, Sophisticated SavedData and Numismatics atomic. Their saves can disagree after a crash. Ordinary clean shutdown is an operational boundary, not proof of power-loss atomicity or physical persistence across every mod. Before/after snapshots are evidence, never unconditional restoration instructions. Follow docs/RECOVERY.md; preserve one consistent server backup.
+
+There is no automatic ledger retention. Monitor disk/WAL size, unresolved records and status; retain unresolved evidence indefinitely. At 48 KiB per transaction, 1,000/day is roughly 1.37 GiB per 30 days before indexes/WAL; actual snapshots may be much larger. Resolved records may be archived offline after backup and review. Protect the database/backups as sensitive inventory and balance records. POSIX directory/file permissions are restricted; Windows needs hosting-account ACLs.
+
+See docs/ARCHITECTURE.md for authority, schema and Mixins; docs/VERIFICATION.md for evidence and remaining gaps; docs/STAGING_CHECKLIST.md for acceptance. The original hybrid proposal is retained, explicitly deferred, in docs/FUTURE_HYBRID_ARCHITECTURE.md.

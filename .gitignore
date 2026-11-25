@@ -1,6 +1,7 @@
 /.gradle/
 /build/
 /run*/
+/logs/
 /dependencies/
 /local.properties
 /.idea/

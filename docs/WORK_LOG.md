@@ -21,3 +21,21 @@
 - Added four executable suites: transaction fault injection, original-JAR structural compatibility, real vanilla item/component adapter tests and canonical Sophisticated schema/UUID tests.
 - Completed README, architecture/Mixin/dependency/configuration notes, explicit durability boundaries, changelog and staging acceptance checklist. Full modpack runtime/Gradle acceptance remains pending; nothing deployed.
 - Final local-cache build passed 2,327 transaction checks, 16 original-JAR structural checks, 11 vanilla adapter checks and 13 canonical-schema/UUID checks. Compiled output is a staging candidate; live Mixin/modpack execution remains unverified.
+
+## Approved local-ledger MVP — 25 November 2026
+
+- Implementing the explicitly approved SQLite-only MVP. MongoDB, replication and distributed coordination remain deferred.
+- Standard Gradle now executes past the previous sandbox socket blocker. It revealed an undeclared localRuntime configuration; replaced that use with runtimeOnly.
+- Development remains in the existing task-workspace Git repository; external project/reference directories are read-only inputs.
+- Planned containment: durable pre-mutation intent, durable outcomes, a persistent breaker, startup recovery checks, read-only audit commands and bounded request work. No automatic recovery/refunds.
+
+- Implemented SQLite-only schema, one bounded native-JDBC writer, pre-mutation durable intent and observed outcomes. All SQL/fingerprinting is off the Minecraft thread.
+- Added global admission cooldown, slot/NBT/intent bounds, asynchronous state revalidation and UUID-alias revalidation, with verified synchronous economic settlement.
+- Added persistent breaker, dirty-boot recovery, normal-loop/save completion markers and global login/disconnection containment; manual reconciliation remains offline and explicit.
+- Added permission-level-two read-only audit commands. No remote workers, MongoDB dependencies, refunds or automatic crash reconciliation.
+- Removed overbroad EntityBlock item exclusion; added ordinary-item, vanilla serialization and budget regressions. Startup hashes installed reference builds, including after config reload.
+- Fixed the Gradle runtimeOnly configuration and development library classpath; removed superseded hand-packaging fallback. SQLite downloaded from official Maven and SHA-256 verified, provided through a temporary local repository because JVM network resolution was restricted.
+- Standard Gradle clean build passed. Final build reran all five suites: 2,399 regression checks passed. Actual NeoForge GameTest passed with real Mixins, bank overflow, upgraded storage, alias invalidation, compensation and serialization.
+- Extended GameTest through Treasury's actual Sell All handler: mixed loose/vanilla/upgraded contents paid 12 Spurs for 256 items; a stale second plan cancelled without mutations. Durable rows and clean-stop metadata verified after exit.
+- Retained the original full H1 hybrid proposal as historical/deferred documentation. Updated approved architecture, schema/authority, dependency notices, config/commands, recovery procedure and staging acceptance checklist.
+- Original four dependency JARs are unchanged and excluded from source/Git/distribution. No production connection or deployment. Full-client, complete-modpack, host-native loading, real crash/fault and performance acceptance remain explicitly pending.
