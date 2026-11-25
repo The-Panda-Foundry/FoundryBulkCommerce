@@ -1,13 +1,19 @@
-# v0.2.0 dedicated-server staging acceptance
+# v0.2.1 dedicated-server final validation
 
-Prepared **25 November 2026**. No production deployment is authorized or performed. Full-pack Linux dedicated staging, absent-addon real-client connection, host profiling and crash validation remain outstanding. Automated headless tests are not substitutes for these checks.
+Prepared **25 November 2026**. No production deployment is authorized or performed. The architect reports initial v0.2.0 dedicated functional success; full host persistence/concurrency/performance/crash qualification and v0.2.1 notification acceptance remain outstanding. Automated headless tests are not substitutes for these checks.
 
 ## Preparation and client compatibility
 
-- [ ] Back up world/player files, both Sophisticated SavedData repositories, Numismatics and ledger consistently. Retain v0.1.2 and Git tag baseline/v0.1.2. Use a separate staging world/database/serverInstanceId, persistent local disk and console access.
-- [ ] Use Java 21, Minecraft 1.21.1 and NeoForge 21.1.256/full modpack. Install only foundrybulkcommerce-0.2.0.jar on the server alongside the unchanged exact references. Check Linux native SQLite loading, startup hashes, commands and healthy admission. Development runtime here was 21.1.265; exact 21.1.256 must be verified.
+- [ ] Back up world/player files, both Sophisticated SavedData repositories, Numismatics and ledger consistently. Retain the accepted v0.2.0 JAR and Git tag baseline/v0.2.0. Use separate staging files on persistent local disk with console access. Preserve an existing ledger binding; see INSTALLATION_AND_ROLLBACK.md before assigning a new ID to a copied ledger.
+- [ ] Use Java 21, Minecraft 1.21.1 and NeoForge 21.1.256/full modpack. Install only foundrybulkcommerce-0.2.1.jar on the server alongside the unchanged exact references. Check Linux native SQLite loading, startup hashes, commands and healthy admission. Development runtime here was 21.1.265; exact 21.1.256 must be verified.
 - [ ] Connect a normal modpack client WITHOUT Bulk Commerce. No missing-registry/channel/config negotiation should occur. Use the existing Treasury Sell All UI and confirm the server handles it. Also connect with the addon on a client if desired; no client data is trusted for eligibility.
 - [ ] Check ordinary player access to permitted shops, denial for prohibited shops, and OP-level-two/console read-only commands. Verify instance ID and recent/player/inspect/unresolved output.
+
+## Notification acceptance
+
+- [ ] With showTransactionMessages=false and debugTransactions=false, preparation/success and their references do not appear in chat; exact extraction/payment, ledger rows and UI refresh still occur.
+- [ ] Cancellation, insufficient stock, unsupported/duplicate-container warnings, busy/disabled/recovery and critical containment remain visible. Quiet mode is not a blanket feedback mute.
+- [ ] Enable showTransactionMessages=true to verify opt-in references; independently enable debugTransactions while chat remains off. Read-only recent/player/inspect must remain usable in all combinations.
 
 ## Economic and eligibility checks
 
@@ -28,3 +34,5 @@ Prepared **25 November 2026**. No production deployment is authorized or perform
 - [ ] Perform one conservative offline manual reconciliation from RECOVERY.md with evidence/operator/reason. Ensure ordinary restart cannot erase unresolved flags. Do not bypass containment by deleting the ledger/removing the addon.
 
 Record exact versions/hashes, before/after quantities and both bank fields, ledger references, timings and any deviations. Architect acceptance is required before any later production deployment.
+
+Use RELEASE_0_2_1.md for the ordered final persistence/concurrency/performance/crash protocol and INSTALLATION_AND_ROLLBACK.md before replacing or restoring any files. No release artifact authorizes production deployment.

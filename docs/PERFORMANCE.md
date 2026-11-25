@@ -1,3 +1,16 @@
+# v0.2.1 performance qualification — 25 November 2026
+
+Production storage/transaction/ledger class bytes are unchanged from accepted0.2.0. The new option adds two bounded cached config reads at notification sites; it introduces no scans or IO. Existing benchmark GameTests reran in the all-equipped0.2.1 runtime (40 samples after12 warmups). These capture/plan/evidence results exclude SQLite/final intent encoding/settlement and remain host/JIT/order sensitive:
+
+| Native Netherite Omega backpacks | Middle ms | Approx. p95 ms | Inspections | Binary NBT bytes |
+| --- | ---: | ---: | ---: | ---: |
+| 1 | 0.266125 | 0.300708 | 212 | 5,755 |
+| 4 | 0.617000 | 0.699042 | 575 | 23,020 |
+
+The unchanged shulker capture benchmark also reran; full logs contain its timings/allocations and current version label. These are macOS/NeoForge21.1.265 headless measurements, not a like-for-like throughput comparison to prior runs, an end-to-end latency guarantee or hosted-server MSPT qualification. Real simultaneous-player admission, world-save/SQLite FULL-commit contention and component-heavy workloads must be profiled on the actual host using RELEASE_0_2_1.md. No budget/default was increased. The following earlier sections retain their explicitly versioned measurement history.
+
+---
+
 # v0.2.0 performance evidence
 
 Recorded **25 November 2026**. macOS ARM64 / Apple M4 Pro, Temurin Java 21.0.12, NeoForge 21.1.265, actual reference mods including Backpacks, Curios, Accessories and its normal Owo dependency. These are development measurements, not hosted Linux/full-modpack MSPT results.

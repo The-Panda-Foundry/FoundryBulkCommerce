@@ -125,3 +125,8 @@ Planning never calls BackpackWrapper.fromStack, which can allocate a UUID, migra
 Vanilla StackEdit requires the captured outer object plus exact image before initial mutation; a verified restored snapshot may be a replacement object. Sophisticated edits require the same outer object, exact components, hotbar slot, canonical image and current unique identity. Source movement, replacement or aliases introduced during asynchronous preparation cancel before mutation/payment. No yield occurs during extraction, verification, payment or compensation. Audit descriptions distinguish Sophisticated backpack and shulker sources; ledger schema, states, common Mixins, bank arithmetic and compensation order are unchanged.
 
 No Backpacks networking, equipment selling, nested traversal, remote storage, automatic crash recovery or future replication infrastructure is added. Actual clientless multiplayer compatibility and independent-resource crash behaviour remain staging gates.
+
+
+## v0.2.1 presentation-only option
+
+showTransactionMessages defaults false. Two local guards suppress routine preparation and APPLIED_MEMORY success chat only. Non-success outcome chat, source rejection warnings, tracing, worker calls, extraction/payment/compensation, UI refresh, admission/containment and audit commands remain on the same paths. Config is read at notification time and is deliberately absent from Plan's economic revalidation fields. No schema migration, lifecycle/Mixin change or new persistence primitive is introduced. Critical disconnect/admission warnings are sent by the existing ledger paths independently of this option.

@@ -1,8 +1,8 @@
-# v0.2.0 integrated-server acceptance
+# v0.2.1 integrated-server final regression
 
 Prepared **25 November 2026**. The architect has reported successful standard-tier/mixed/hotbar/protected/partial-sale scenarios in LIVE_ACCEPTANCE_2026-11-25.md. Boxes below are the full regression protocol; they remain unchecked because broader rows include unverified subcases. Automated results are in VERIFICATION.md. Use a disposable copy and the full Panda Foundry modpack, Java 21 / NeoForge 21.1.256. Do not test failure boundaries in a valuable world.
 
-- [ ] Preserve the accepted v0.1.2 JAR and consistent world/ledger backup. Replace only the addon with v0.2.0. Confirm one addon JAR and the exact reference mods; do not modify dependency JARs.
+- [ ] Preserve the accepted v0.1.2 JAR and consistent world/ledger backup. Preserve accepted v0.2.0 and replace only the addon with v0.2.1. Confirm one addon JAR and the exact reference mods; do not modify dependency JARs.
 - [ ] Open a staging copy with a distinct serverInstanceId/ledger identity. Confirm physical CLIENT initialization, logical IntegratedServer, dependency hashes, command registration and healthy SQLite admission. With cheats/OP level 2, run /bulkcommerce status.
 - [ ] Verify all nine hotbar slots are eligible regardless of selection. With matching stock only inside main-inventory, offhand, armour and equipped backpacks, Sell All must leave it untouched. Loose matching items in ordinary main inventory must still sell.
 - [ ] Test every row and passive modifier in V0_2_0_COMPATIBILITY.md. Cover empty/partial/full, different and same tiers, mixtures of vanilla/Storage/Backpacks and loose items, exact component differences and unsupported upgrades. Preserve names, colours, settings, upgrades and unrelated/nested contents.
@@ -16,3 +16,5 @@ Prepared **25 November 2026**. The architect has reported successful standard-ti
 - [ ] Verify clean world switching/shutdown and persistent emergency containment using RECOVERY.md. Dirty-boot/kill tests remain separate fault acceptance; never delete a journal or automatically replay/refund to clear a breaker.
 
 Record exact mod/loader hashes, transaction references, balances, before/after counts and deviations. Successful v0.1.2 gameplay does not automatically certify the new v0.2.0 equipment/eligibility paths.
+
+- [ ] Verify default-false showTransactionMessages hides only preparation/success chat; opt-in restores both references. Failures and security/containment remain visible; debugTransactions and administrator commands remain independent. Detailed notification automation passed, but target-client presentation still requires acceptance.

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.1 — 25 November 2026 — final release candidate
+
+- Add showTransactionMessages=false, independently of debugTransactions. Suppress only routine preparation/success chat and their references by default; retain failure/rejection/security/circuit-breaker messages, ledger evidence and administrator commands.
+- Keep transaction execution, asynchronous intent/outcome handling, matching/extraction/payment/compensation, schema, compatibility pins and UI refresh unchanged.
+- Add actual server-message capture tests for quiet/visible sales, debug independence, pending-intent option changes, visible stale/insufficient-stock/admission rejections, exact bank/stock and unique durable ledger records. Correct the existing performance harness's current-version label.
+- Preserve accepted v0.2.0 in Git; document architect-reported integrated/initial dedicated acceptance, focused final review, deployment gates, installation/rollback and explicit cross-resource durability limits.
+- No storage integrations/features/refactoring, Commerce Fixtures packaging, unrelated Numismatics crash fix or production deployment.
+
 ## 0.2.0 — 25 November 2026
 
 - Optional Sophisticated Backpacks 3.26.9.2195 integration: all six registered tiers and nine passive stack modifiers, including Omega, through the existing canonical storage API.

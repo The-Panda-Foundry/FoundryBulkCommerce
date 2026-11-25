@@ -1,5 +1,22 @@
 # Verification and review disposition
 
+## Current v0.2.1 final release candidate — 25 November 2026
+
+The architect reports extensive integrated and initial dedicated v0.2.0 functional success. Preserved source04d165f under annotated baseline/v0.2.0 before the notification-only change. This candidate still needs the final target-host gates in RELEASE_0_2_1.md; earlier versioned evidence below remains historical.
+
+- **Normal Java21 clean build passes; 2,406 executable checks pass. Ten actual required NeoForge GameTests pass** with Backpacks/Curios/Accessories. Existing matrix counts443 Storage and224 Backpacks remain unchanged.
+- New recording-player runtime verifies default-false silent preparation/success, explicit opt-in references, debug independence, option changes during async intent, exact bank/extraction/unrelated contents, visible cancellation/preparation/admission rejections and six unique durable outcomes. The presentation key is not part of economic revalidation; UI refresh remains unconditional on it.
+- Optional integrations absent run passes ten harness cases: five active base/notification tests and five guarded/skipped optional tests. No optional storage coverage is inferred from skipped cases.
+- Toolchain/runtime: Temurin21.0.12/macOS ARM64, Minecraft1.21.1, Gradle9.2.1, ModDevGradle2.0.148, NeoForge21.1.265. Exact21.1.256 artifacts remain uncached; its offline request failed. Reused existing Gradle cache and temporary local SQLite Maven override. No hand packager/fallback compiler.
+- JAR SHA-256: `a771ce495925ff0612e793e0419475f87f87d5f48fd2fb102109eb847eb06d38`; Java class major65;45 addon classes. Compared with accepted0.2.0 archive: **only BulkConfig, BulkSales and FoundryBulkCommerce class bytes differ**. The other42 classes, including transaction coordinator, wallet implementation, storage, ledger and Mixins, are byte-identical. Manifest/mod version changes are expected. Exact nested SQLite SHA remains3684ac5e9bd893cbe68eb0ac1708343f66be829b1d2b5ab317e783d05acd5aef. No GameTest, Commerce Fixtures or foreign dependency-mod classes included.
+- Focused final review identified no new verified release-blocking implementation defect in the reviewed paths. Remaining target-host client/persistence/concurrency/performance/crash/manual-reconciliation gates are not declared complete. No guaranteed cross-resource atomic disk persistence; no automatic replay/refund/reconciliation; critical containment remains unchanged. The unrelated Numismatics sales-point crash is not fixed or investigated by this release.
+- Production code changes are limited to the default-false option, two routine chat guards and version metadata; diagnostics and failed/critical messages are not filtered. Test-only benchmark labels now identify the actual current release. No Commerce Fixtures/dependency modification or production deployment.
+
+Full configuration/command behaviour: CONFIGURATION.md and ADMIN_COMMANDS.md. Installation, compatible software downgrade and consistent-data rollback policy: INSTALLATION_AND_ROLLBACK.md. Detailed focused review and final validation instructions: RELEASE_0_2_1.md. Source commits/tag and checksum manifests are in the delivery receipt/Git history.
+
+---
+
+
 ## Architect-reported live acceptance update — 25 November 2026
 
 Standard backpack tiers, mixed backpacks/shulkers, a 300,000-wheat Omega Netherite shulker, hotbar-only extraction, protected main-inventory and Curios storage, and partial remainder retention passed manual integrated testing. The mixed sale left 1,120 wheat in one eligible backpack and protected containers untouched. See LIVE_ACCEPTANCE_2026-11-25.md for precise evidence boundaries and the final validation plan. Working implementation d25249a is preserved by annotated tag acceptance/v0.2.0-integrated-functional-2026-11-25. Upgraded backpack testing, persistence, real-player concurrency, crash/manual recovery and dedicated/client compatibility remain unverified. No production code or JAR changed for this record; automated results below are the existing evidence.

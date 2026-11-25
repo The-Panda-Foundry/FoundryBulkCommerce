@@ -1,4 +1,6 @@
-# v0.2.0 storage compatibility matrix
+# v0.2.0 / v0.2.1 storage compatibility matrix
+
+The v0.2.1 adapters are byte-identical to accepted v0.2.0; the matrix below is unchanged. Final release validation status is in RELEASE_0_2_1.md.
 
 Verified **25 November 2026**, against the exact reference archives. Production uses namespace + actual ShulkerBoxItem/BackpackItem APIs, not a fixed tier allowlist. Capacities are API defaults from the test configuration; modern stored capacity components are supported within the existing work/byte limits. Changes to dependency bytes are rejected until reviewed.
 

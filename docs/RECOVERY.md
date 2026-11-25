@@ -28,3 +28,8 @@ Use persistent local storage and host disk alerts. POSIX ledger directory is 070
 ## v0.2.0 backpack evidence
 
 Backpacks and Storage are independent canonical SavedData repositories (sophisticatedbackpacks and sophisticatedstorage). A UUID alone cannot identify which resource to reconcile. Source descriptions identify backpack versus shulker; inspect the matching repository and preserve its full settings/upgrades/root metadata. Equal UUID values across repositories do not establish an alias. Recovered item positions may differ from the original hotbar snapshot: never infer extraction authorization or ownership from position alone after a crash. The hotbar rule and additional canonical API do not provide coordinated crash persistence; manual evidence-based containment remains mandatory.
+
+
+## v0.2.1 notification setting
+
+showTransactionMessages only controls routine preparation/success chat; it does not remove ledger records, warnings, persistent breaker/login containment or manual recovery obligations. Silent success still means APPLIED_MEMORY rather than cross-resource disk atomicity. Notification-only software rollback to accepted v0.2.0 requires no schema migration; never treat a downgrade as permission to clear/replay unresolved outcomes. See INSTALLATION_AND_ROLLBACK.md.
