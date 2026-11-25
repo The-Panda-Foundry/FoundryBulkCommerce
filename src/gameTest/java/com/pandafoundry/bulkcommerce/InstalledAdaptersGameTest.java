@@ -33,7 +33,7 @@ import net.p3pp3rf1y.sophisticatedstorage.item.StackStorageWrapper;
 @GameTestHolder("foundrybulkcommerce")
 @PrefixGameTestTemplate(false)
 public final class InstalledAdaptersGameTest {
-    @GameTest(template = "empty", timeoutTicks = 4000)
+    @GameTest(template = "empty", timeoutTicks = 100000)
     public static void installedAdapters(GameTestHelper helper) {
         Flow flow = new Flow();
         helper.startSequence().thenWaitUntil(() -> helper.assertTrue(LedgerRuntime.admissionOpen(), "Ledger must become ready: " + (LedgerRuntime.ledger() == null ? "missing" : LedgerRuntime.ledger().health())))

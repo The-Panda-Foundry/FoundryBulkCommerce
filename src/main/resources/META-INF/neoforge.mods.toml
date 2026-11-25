@@ -3,7 +3,7 @@ loaderVersion="[4,)"
 license="All Rights Reserved"
 [[mods]]
 modId="foundrybulkcommerce"
-version="0.1.1"
+version="0.1.2"
 displayName="Foundry: Bulk Commerce"
 authors="The Panda Foundry"
 description="Verified bulk selling from carried shulker boxes through Treasury Sell All."

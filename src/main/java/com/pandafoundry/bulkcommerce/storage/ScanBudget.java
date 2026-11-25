@@ -11,7 +11,12 @@ public final class ScanBudget {
     private final int slotLimit, byteLimit;
     private int slots, bytes;
     public ScanBudget(int slotLimit, int byteLimit) { this.slotLimit = slotLimit; this.byteLimit = byteLimit; }
-    public void slot() { if (++slots > slotLimit) throw new IllegalStateException("Slot inspection limit exceeded"); }
+    public void slot() { if (++slots > slotLimit) throw new SaleRejection(SaleRejection.Reason.SCAN_LIMIT, "Slot inspection limit exceeded"); }
+    public void container(int capacity) {
+        if (capacity > slotLimit) throw new SaleRejection(SaleRejection.Reason.SCAN_LIMIT, "Container capacity exceeds scan ceiling");
+    }
+    public int slots() { return slots; }
+    public int bytes() { return bytes; }
     public void nbt(CompoundTag tag) {
         try {
             NbtIo.write(tag, new DataOutputStream(new OutputStream() {
@@ -22,6 +27,6 @@ public final class ScanBudget {
                     bytes += count;
                 }
             }));
-        } catch (IOException limit) { throw new IllegalStateException("NBT snapshot limit exceeded", limit); }
+        } catch (IOException limit) { throw new SaleRejection(SaleRejection.Reason.SNAPSHOT_LIMIT, "NBT snapshot or serialization limit exceeded"); }
     }
 }

@@ -13,7 +13,7 @@ import net.neoforged.neoforge.common.NeoForge;
 @Mod(FoundryBulkCommerce.MOD_ID)
 public final class FoundryBulkCommerce {
     public static final String MOD_ID = "foundrybulkcommerce";
-    public static final String VERSION = "0.1.1";
+    public static final String VERSION = "0.1.2";
     public static final Logger LOGGER = LogUtils.getLogger();
     public FoundryBulkCommerce(ModContainer container) {
         container.registerConfig(ModConfig.Type.SERVER, BulkConfig.SPEC);

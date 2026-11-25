@@ -62,15 +62,20 @@ public final class BulkSales {
             boolean vanilla = BulkConfig.VANILLA.get(), sophisticated = BulkConfig.SOPHISTICATED.get();
             List<SaleSource> sources = new ArrayList<>(VanillaSources.collect(player, template, vanilla, budget));
             int skipped = 0;
+            List<SophisticatedSources.Skipped> rejectedSources = List.of();
             if (sophisticated && ModList.get().isLoaded("sophisticatedstorage") && ModList.get().isLoaded("sophisticatedcore")) {
                 var collected = SophisticatedSources.collect(player, template, budget);
                 sources.addAll(collected.sources()); skipped = collected.skipped();
+                rejectedSources = collected.rejections();
             }
+            for (var rejected : rejectedSources) trace(id, "source skipped slot=" + rejected.slot() + " item=" + rejected.item() + " reason=" + rejected.reason());
+            trace(id, "work slots=" + budget.slots() + " scannedNbtBytes=" + budget.bytes());
             long available = 0;
             for (SaleSource source : sources) available = Math.addExact(available, source.available());
             int quantity = Transaction.quantity(available, lotSize, BulkConfig.LIMIT.get());
             trace(id, "planned available=" + available + " items=" + quantity + " lotSize=" + lotSize + " pricePerLot=" + price + " skippedBoxes=" + skipped);
-            if (quantity == 0) throw new IllegalArgumentException("No complete lot fits the stock and transaction limit; skipped boxes: " + skipped);
+            if (quantity == 0) throw new SaleRejection(available < lotSize ? SaleRejection.Reason.INSUFFICIENT_STOCK : SaleRejection.Reason.VALIDATION_FAILURE,
+                "No complete eligible bundle fits stock and transaction limit; skipped sources=" + skipped);
             int total = Math.multiplyExact(price, quantity / lotSize);
             AccountWallet wallet = new AccountWallet(player, BankService.account(player));
             wallet.checkCapacity(total);
@@ -93,7 +98,7 @@ public final class BulkSales {
             for (var edit : edits) evidence.add(edit.recoveryDetails());
             intent.add("sourceBeforeAfterImages", evidence);
             String json = intent.toString();
-            if (json.getBytes(StandardCharsets.UTF_8).length > BulkConfig.SNAPSHOT_LIMIT.get()) throw new IllegalArgumentException("Intent snapshot byte limit exceeded");
+            if (json.getBytes(StandardCharsets.UTF_8).length > BulkConfig.SNAPSHOT_LIMIT.get()) throw new SaleRejection(SaleRejection.Reason.SNAPSHOT_LIMIT, "Intent snapshot byte limit exceeded");
             LocalLedger ledger = LedgerRuntime.ledger();
             Plan plan = new Plan(id, player, server, ledger, shop, player.level().dimension().location().toString(), pos,
                 template, lotSize, price, quantity, total, List.copyOf(edits), wallet, now, skipped, vanilla, sophisticated);
@@ -111,8 +116,9 @@ public final class BulkSales {
         } catch (RuntimeException preparationFailure) {
             active = null;
             FoundryBulkCommerce.LOGGER.debug("Rejected sale preparation {} ({})", id, preparationFailure.getClass().getSimpleName());
-            trace(id, "preparation rejected category=" + preparationFailure.getClass().getSimpleName());
-            feedback(player, "Sale not started: check matching stock, supported storage and configured limits. Reference: " + id, false);
+            var reason = preparationFailure instanceof SaleRejection rejection ? rejection.reason() : SaleRejection.Reason.VALIDATION_FAILURE;
+            trace(id, "preparation rejected reason=" + reason + " category=" + preparationFailure.getClass().getSimpleName());
+            feedback(player, "Sale not started: " + reason + ". Reference: " + id, false);
         }
     }
 

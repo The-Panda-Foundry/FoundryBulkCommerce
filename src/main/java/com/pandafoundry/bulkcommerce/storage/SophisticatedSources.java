@@ -22,15 +22,19 @@ import net.p3pp3rf1y.sophisticatedcore.upgrades.stack.StackUpgradeItem;
 import net.p3pp3rf1y.sophisticatedstorage.block.ItemContentsStorage;
 import net.p3pp3rf1y.sophisticatedstorage.item.ShulkerBoxItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.StackStorageWrapper;
+import net.p3pp3rf1y.sophisticatedstorage.item.StorageBlockItem;
+import static com.pandafoundry.bulkcommerce.storage.SaleRejection.Reason.*;
 
-/** Version-pinned adapter for canonical, finite, unlinked item storage. Planning never creates wrappers or UUIDs. */
+/** Pinned canonical schema; eligibility/capacity comes from the actual registered shulker APIs. */
 public final class SophisticatedSources {
-    private static final int MAX_SLOTS = 256;
-    private static final Set<String> STACK_UPGRADES = Set.of("stack_upgrade_tier_1", "stack_upgrade_tier_1_plus",
-        "stack_upgrade_tier_2", "stack_upgrade_tier_3", "stack_upgrade_tier_4", "stack_upgrade_tier_5", "stack_upgrade_omega_tier");
     private SophisticatedSources() {}
+    public record Skipped(int slot, String item, SaleRejection.Reason reason) {}
+    public record Collected(List<SaleSource> sources, List<Skipped> rejections) {
+        public int skipped() { return rejections.size(); }
+    }
+    private record Match(int entry, int count) {}
+    private record Parsed(long matching, List<Match> matches) {}
 
-    public record Collected(List<SaleSource> sources, int skipped) {}
     public static Collected collect(ServerPlayer player, ItemStack template) {
         return collect(player, template, new ScanBudget(32768, 4194304));
     }
@@ -39,7 +43,6 @@ public final class SophisticatedSources {
             throw new IllegalStateException("Canonical Sophisticated storage requires the server thread group");
         var inventory = player.getInventory();
         List<UUID> identities = new ArrayList<>();
-        // Include all carried identities, even unsupported containers; never count a UUID twice.
         for (int i = 0; i < inventory.getContainerSize(); i++) {
             budget.slot();
             UUID uuid = inventory.getItem(i).get(ModCoreDataComponents.STORAGE_UUID);
@@ -47,34 +50,36 @@ public final class SophisticatedSources {
         }
         Set<UUID> duplicateIdentities = duplicates(identities);
         List<SaleSource> sources = new ArrayList<>();
-        int skipped = 0;
+        List<Skipped> rejected = new ArrayList<>();
         for (int i = 0; i < inventory.getContainerSize(); i++) {
             budget.slot();
             ItemStack stack = inventory.getItem(i);
-            if (!(stack.getItem() instanceof ShulkerBoxItem)) continue;
             UUID uuid = stack.get(ModCoreDataComponents.STORAGE_UUID);
-            if (stack.getCount() != 1 || stack.has(ModCoreDataComponents.LINKED_STORAGE_ENDPOINT)
-                    || stack.has(DataComponents.BLOCK_ENTITY_DATA) || stack.has(DataComponents.CUSTOM_DATA)
-                    || !BuiltInRegistries.ITEM.getKey(stack.getItem()).getNamespace().equals("sophisticatedstorage")) {
-                skipped++; continue;
+            var id = BuiltInRegistries.ITEM.getKey(stack.getItem());
+            if (!(stack.getItem() instanceof ShulkerBoxItem)) {
+                if (uuid != null) rejected.add(new Skipped(i, id.toString(), UNSUPPORTED_STORAGE));
+                continue;
             }
-            if (uuid == null) continue; // New empty boxes have no canonical contents; do not allocate storage.
-            if (duplicateIdentities.contains(uuid)) { skipped++; continue; }
-            CompoundTag root = ItemContentsStorage.get().getStorageContents(uuid).orElse(null);
-            if (root != null) budget.nbt(root);
-            if (root == null || !supported(player.registryAccess(), root, budget)) { skipped++; continue; }
-            root = root.copy();
-            CompoundTag storedInventory = root.getCompound("storageWrapper").getCompound("contents").getCompound("inventory");
-            ListTag items = storedInventory.getList("Items", Tag.TAG_COMPOUND);
-            long matching = 0;
-            for (int n = 0; n < items.size(); n++) {
-                budget.slot();
-                ItemStack item = decode(player.registryAccess(), items.getCompound(n));
-                if (ItemPolicy.saleable(item) && ItemStack.isSameItemSameComponents(item, template)) matching += item.getCount();
+            try {
+                if (stack.getCount() != 1 || !id.getNamespace().equals("sophisticatedstorage")
+                        || stack.has(ModCoreDataComponents.LINKED_STORAGE_ENDPOINT)
+                        || stack.has(DataComponents.BLOCK_ENTITY_DATA) || stack.has(DataComponents.CUSTOM_DATA))
+                    throw reject(UNSUPPORTED_STORAGE, "Linked, legacy or unverified storage item");
+                if (uuid == null) continue; // Empty new storage: no migration, UUID or wrapper allocation.
+                if (duplicateIdentities.contains(uuid)) throw reject(DUPLICATE_UUID, "Duplicate carried storage identity");
+                CompoundTag root = ItemContentsStorage.get().getStorageContents(uuid).orElseThrow(() -> reject(INVALID_DATA, "Missing canonical contents"));
+                budget.nbt(root);
+                // The getNumber... APIs mutate outer components. Use the non-mutating defaults plus modern saved components.
+                int capacity = Math.max(StorageBlockItem.getDefaultNumberOfInventorySlots(stack), stack.getOrDefault(ModCoreDataComponents.NUMBER_OF_INVENTORY_SLOTS, 0));
+                int upgradeSlots = Math.max(StorageBlockItem.getDefaultNumberOfUpgradeSlots(stack), stack.getOrDefault(ModCoreDataComponents.NUMBER_OF_UPGRADE_SLOTS, 0));
+                Parsed parsed = parse(player.registryAccess(), root, template, budget, capacity, upgradeSlots);
+                if (parsed.matching() > 0) sources.add(new CanonicalSource(player, i, stack, uuid, root.copy(), parsed.matching(), parsed.matches()));
+            } catch (SaleRejection failure) {
+                if (failure.reason() == SCAN_LIMIT || failure.reason() == SNAPSHOT_LIMIT) throw failure;
+                rejected.add(new Skipped(i, id.toString(), failure.reason()));
             }
-            if (matching > 0) sources.add(new CanonicalSource(player, i, stack, uuid, root, matching, template));
         }
-        return new Collected(sources, skipped);
+        return new Collected(List.copyOf(sources), List.copyOf(rejected));
     }
 
     static Set<UUID> duplicates(Iterable<UUID> identities) {
@@ -82,86 +87,114 @@ public final class SophisticatedSources {
         for (UUID uuid : identities) if (!seen.add(uuid)) duplicates.add(uuid);
         return duplicates;
     }
-
+    private static SaleRejection reject(SaleRejection.Reason reason, String explanation) { return new SaleRejection(reason, explanation); }
+    private static CompoundTag compound(CompoundTag parent, String name) {
+        if (!parent.contains(name, Tag.TAG_COMPOUND)) throw reject(INVALID_DATA, "Invalid " + name + " compound");
+        return parent.getCompound(name);
+    }
+    private static ListTag entries(CompoundTag inventory) {
+        if (!inventory.contains("Items", Tag.TAG_LIST)) throw reject(INVALID_DATA, "Missing inventory list");
+        var raw = (ListTag)inventory.get("Items");
+        if (!raw.isEmpty() && raw.getElementType() != Tag.TAG_COMPOUND) throw reject(INVALID_DATA, "Invalid inventory entry type");
+        return raw;
+    }
     private static ItemStack decode(Provider registries, CompoundTag tag) {
-        // The verified Core schema is ordinary id/components plus an unrestricted integer count.
-        // Decode components with Minecraft's public codec at count=1, then restore the exact count.
-        // This avoids initializing Core's unrelated client/container codecs during server-side planning.
-        if (tag.contains("count") && !tag.contains("count", Tag.TAG_INT)) throw new IllegalStateException("Invalid stored count type");
+        if (!tag.contains("id", Tag.TAG_STRING) || (tag.contains("count") && !tag.contains("count", Tag.TAG_INT)))
+            throw reject(INVALID_DATA, "Invalid stored item fields");
         int count = tag.contains("count") ? tag.getInt("count") : 1;
-        if (count <= 0) throw new IllegalStateException("Invalid stored count");
-        CompoundTag single = tag.copy();
-        single.putInt("count", 1);
-        return ItemStack.CODEC.parse(registries.createSerializationContext(NbtOps.INSTANCE), single).getOrThrow().copyWithCount(count);
+        if (count <= 0) throw reject(INVALID_DATA, "Invalid stored count");
+        CompoundTag single = tag.copy(); single.putInt("count", 1);
+        try { return ItemStack.CODEC.parse(registries.createSerializationContext(NbtOps.INSTANCE), single).getOrThrow().copyWithCount(count); }
+        catch (RuntimeException malformed) { throw reject(INVALID_DATA, "Stored item cannot be decoded"); }
     }
-
-    static boolean supported(Provider registries, CompoundTag root) {
-        return supported(registries, root, new ScanBudget(32768, 4194304));
-    }
-    private static boolean supported(Provider registries, CompoundTag root, ScanBudget budget) {
-        if (!root.contains("storageWrapper", Tag.TAG_COMPOUND)) return false;
-        CompoundTag contents = root.getCompound("storageWrapper").getCompound("contents");
-        if (!contents.contains("inventory", Tag.TAG_COMPOUND)) return false;
-        CompoundTag inventory = contents.getCompound("inventory");
+    private static Parsed parse(Provider registries, CompoundTag root, ItemStack template, ScanBudget budget, int capacity, int upgradeCapacity) {
+        CompoundTag contents = compound(compound(root, "storageWrapper"), "contents");
+        CompoundTag inventory = compound(contents, "inventory");
+        if (!inventory.contains("Size", Tag.TAG_INT)) throw reject(INVALID_DATA, "Invalid inventory size type");
         int size = inventory.getInt("Size");
-        if (size < 1 || size > MAX_SLOTS || !inventory.contains("Items", Tag.TAG_LIST)) return false;
-        ListTag items = inventory.getList("Items", Tag.TAG_COMPOUND);
-        if (items.size() != ((ListTag)inventory.get("Items")).size() || items.size() > size) return false;
-        Set<Integer> slots = new HashSet<>();
-        for (int n = 0; n < items.size(); n++) {
-            budget.slot();
-            CompoundTag itemTag = items.getCompound(n);
-            if (!itemTag.contains("Slot", Tag.TAG_INT) || !itemTag.contains("id", Tag.TAG_STRING)) return false;
-            int slot = itemTag.getInt("Slot");
-            if (slot < 0 || slot >= size || !slots.add(slot) || decode(registries, itemTag).getCount() <= 0) return false;
-        }
+        if (size <= 0 || size > capacity) throw reject(INVALID_DATA, "Canonical size exceeds storage API capacity");
+        budget.container(size);
+        ListTag items = entries(inventory);
+        if (items.size() > size) throw reject(INVALID_DATA, "Too many serialized entries");
         if (contents.contains("partitioner")) {
-            CompoundTag parts = contents.getCompound("partitioner");
+            CompoundTag parts = compound(contents, "partitioner");
             int[] base = parts.getIntArray("baseIndexes");
             ListTag names = parts.getList("inventoryPartNames", Tag.TAG_STRING);
-            if (base.length != 1 || base[0] != 0 || names.size() != 1 || !names.getString(0).equals("default")) return false;
+            if (base.length != 1 || base[0] != 0 || names.size() != 1 || !names.getString(0).equals("default"))
+                throw reject(UNSUPPORTED_STORAGE, "Non-default or infinite partition");
         }
         if (contents.contains("upgradeInventory")) {
-            CompoundTag upgrades = contents.getCompound("upgradeInventory");
-            if (!upgrades.contains("Items", Tag.TAG_LIST)) return false;
-            ListTag upgradeItems = upgrades.getList("Items", Tag.TAG_COMPOUND);
-            if (upgradeItems.size() != ((ListTag)upgrades.get("Items")).size() || upgradeItems.size() > 16) return false;
+            CompoundTag upgrades = compound(contents, "upgradeInventory");
+            ListTag upgradeItems = entries(upgrades);
+            if (!upgrades.contains("Size", Tag.TAG_INT) || upgrades.getInt("Size") < 0 || upgrades.getInt("Size") > upgradeCapacity)
+                throw reject(INVALID_DATA, "Invalid upgrade inventory size");
+            if (upgradeItems.size() > upgrades.getInt("Size")) throw reject(INVALID_DATA, "Too many upgrades");
+            Set<Integer> upgradeSlots = new HashSet<>();
             for (int n = 0; n < upgradeItems.size(); n++) {
                 budget.slot();
-                ItemStack upgrade = decode(registries, upgradeItems.getCompound(n));
-                var id = BuiltInRegistries.ITEM.getKey(upgrade.getItem());
-                if (!(upgrade.getItem() instanceof StackUpgradeItem) || !id.getNamespace().equals("sophisticatedstorage")
-                        || !STACK_UPGRADES.contains(id.getPath()) || upgrade.getCount() != 1) return false;
+                CompoundTag tag = upgradeItems.getCompound(n);
+                int slot = tag.getInt("Slot");
+                if (!tag.contains("Slot", Tag.TAG_INT) || slot < 0 || slot >= upgrades.getInt("Size") || !upgradeSlots.add(slot))
+                    throw reject(INVALID_DATA, "Invalid upgrade slot");
+                ItemStack upgrade = decode(registries, tag);
+                // Exact class is passive multiplier-only in the pinned Core JAR; subclass/other upgrades may have hooks.
+                if (upgrade.getItem().getClass() != StackUpgradeItem.class
+                        || !BuiltInRegistries.ITEM.getKey(upgrade.getItem()).getNamespace().equals("sophisticatedstorage") || upgrade.getCount() != 1)
+                    throw reject(UNSUPPORTED_UPGRADE, "Only registered passive stack upgrades supported");
+                double multiplier = ((StackUpgradeItem)upgrade.getItem()).getStackSizeMultiplier();
+                if (!Double.isFinite(multiplier) || multiplier <= 0) throw reject(UNSUPPORTED_UPGRADE, "Invalid stack multiplier");
             }
         }
-        return true;
+        Set<Integer> slots = new HashSet<>();
+        List<Match> matches = new ArrayList<>();
+        long matching = 0;
+        for (int n = 0; n < items.size(); n++) {
+            budget.slot();
+            CompoundTag tag = items.getCompound(n);
+            int slot = tag.getInt("Slot");
+            if (!tag.contains("Slot", Tag.TAG_INT) || slot < 0 || slot >= size || !slots.add(slot)) throw reject(INVALID_DATA, "Invalid or duplicate inventory slot");
+            ItemStack item = decode(registries, tag);
+            if (ItemPolicy.saleable(item) && ItemStack.isSameItemSameComponents(item, template)) {
+                matching = Math.addExact(matching, (long)item.getCount());
+                matches.add(new Match(n, item.getCount()));
+            }
+        }
+        return new Parsed(matching, List.copyOf(matches));
     }
-
-    static CompoundTag removeContents(Provider registries, CompoundTag before, ItemStack template, int amount) {
+    // Isolated schema tests use explicit capacity bounds without allocating live wrappers.
+    static boolean supported(Provider registries, CompoundTag root, int capacity, int upgradeCapacity) {
+        try { parse(registries, root, ItemStack.EMPTY, new ScanBudget(32768, 4194304), capacity, upgradeCapacity); return true; }
+        catch (SaleRejection invalid) { return false; }
+    }
+    static CompoundTag removeContents(Provider registries, CompoundTag before, ItemStack template, int amount, int capacity, int upgradeCapacity) {
+        Parsed parsed = parse(registries, before, template, new ScanBudget(32768, 4194304), capacity, upgradeCapacity);
+        return removeMatching(before, parsed.matches(), amount);
+    }
+    private static CompoundTag removeMatching(CompoundTag before, List<Match> matches, int amount) {
+        if (amount <= 0) throw reject(VALIDATION_FAILURE, "Invalid removal quantity");
         CompoundTag after = before.copy();
         CompoundTag inv = after.getCompound("storageWrapper").getCompound("contents").getCompound("inventory");
-        ListTag updated = new ListTag();
-        int remaining = amount;
-        for (Tag tag : inv.getList("Items", Tag.TAG_COMPOUND)) {
-            CompoundTag entry = ((CompoundTag)tag).copy();
-            ItemStack item = decode(registries, entry);
-            if (remaining > 0 && ItemPolicy.saleable(item) && ItemStack.isSameItemSameComponents(item, template)) {
-                int removed = Math.min(remaining, item.getCount());
-                remaining -= removed;
-                if (removed == item.getCount()) continue;
-                entry.putInt("count", item.getCount() - removed);
+        ListTag items = inv.getList("Items", Tag.TAG_COMPOUND), updated = new ListTag();
+        int remaining = amount, matchIndex = 0;
+        for (int n = 0; n < items.size(); n++) {
+            CompoundTag entry = items.getCompound(n);
+            if (matchIndex < matches.size() && matches.get(matchIndex).entry() == n) {
+                int count = matches.get(matchIndex++).count();
+                int removed = Math.min(remaining, count); remaining -= removed;
+                if (removed == count) continue;
+                if (removed > 0) entry.putInt("count", count - removed);
             }
             updated.add(entry);
         }
-        if (remaining != 0 || amount <= 0) throw new IllegalStateException("Sophisticated plan underflow");
+        if (remaining != 0) throw reject(VALIDATION_FAILURE, "Sophisticated plan underflow");
         inv.put("Items", updated);
         return after;
     }
 
     private record CanonicalSource(ServerPlayer player, int slot, ItemStack reference, UUID uuid,
-            CompoundTag before, long available, ItemStack template) implements SaleSource {
+            CompoundTag before, long available, List<Match> matches) implements SaleSource {
         public Transaction.Edit remove(int amount) {
-            CompoundTag after = removeContents(player.registryAccess(), before, template, amount);
+            CompoundTag after = removeMatching(before, matches, amount);
             ItemStack outerSnapshot = reference.copy();
             return new Transaction.Edit() {
                 private boolean outerUnchanged() {

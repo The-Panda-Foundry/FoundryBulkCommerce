@@ -37,31 +37,31 @@ public final class SophisticatedSchemaTest {
         inventory.putInt("Size",27); inventory.put("Items",items);
         contents.put("inventory",inventory); wrapper.put("contents",contents); root.put("storageWrapper",wrapper);
         CompoundTag original = root.copy();
-        check(SophisticatedSources.supported(registries,root), "oversized finite stacks accepted");
-        CompoundTag after = SophisticatedSources.removeContents(registries,root,new ItemStack(Items.STONE),1048576);
+        check(SophisticatedSources.supported(registries,root,27,16), "oversized finite stacks accepted");
+        CompoundTag after = SophisticatedSources.removeContents(registries,root,new ItemStack(Items.STONE),1048576,27,16);
         check(root.equals(original), "planning does not mutate canonical source");
         ListTag updated = inventory(after).getList("Items",Tag.TAG_COMPOUND);
         check(updated.size() == 2 && updated.getCompound(1).getInt("count") == Integer.MAX_VALUE, "exact oversized slot removal; other oversized stack preserved");
         check(updated.getCompound(0).equals(items.getCompound(1)), "nonmatching serialized entry preserved");
-        after = SophisticatedSources.removeContents(registries,root,new ItemStack(Items.STONE),1048580);
+        after = SophisticatedSources.removeContents(registries,root,new ItemStack(Items.STONE),1048580,27,16);
         check(inventory(after).getList("Items",Tag.TAG_COMPOUND).getCompound(1).getInt("count") == Integer.MAX_VALUE-4, "oversized reduction across slot boundary");
         CompoundTag duplicate = root.copy();
         inventory(duplicate).getList("Items",Tag.TAG_COMPOUND).add(item(0,"minecraft:stone",20));
-        check(!SophisticatedSources.supported(registries,duplicate), "duplicate serialized slot rejected");
+        check(!SophisticatedSources.supported(registries,duplicate,27,16), "duplicate serialized slot rejected");
         CompoundTag outside = root.copy(); inventory(outside).getList("Items",Tag.TAG_COMPOUND).getCompound(0).putInt("Slot",27);
-        check(!SophisticatedSources.supported(registries,outside), "out-of-bounds slot rejected");
+        check(!SophisticatedSources.supported(registries,outside,27,16), "out-of-bounds slot rejected");
         CompoundTag partitioned = root.copy(); CompoundTag partition = new CompoundTag();
         partition.putIntArray("baseIndexes",new int[]{0,1});
         partitioned.getCompound("storageWrapper").getCompound("contents").put("partitioner",partition);
-        check(!SophisticatedSources.supported(registries,partitioned), "partitioned/infinite storage rejected");
+        check(!SophisticatedSources.supported(registries,partitioned,27,16), "partitioned/infinite storage rejected");
         CompoundTag tooLarge = root.copy(); inventory(tooLarge).putInt("Size",257);
-        check(!SophisticatedSources.supported(registries,tooLarge), "scan bound enforced");
+        check(!SophisticatedSources.supported(registries,tooLarge,27,16), "canonical size cannot exceed supplied API capacity");
         CompoundTag upgradeRoot = root.copy(), upgrades = new CompoundTag(); ListTag upgradeItems = new ListTag();
-        upgradeItems.add(item(0,"minecraft:stone",1)); upgrades.put("Items",upgradeItems);
+        upgradeItems.add(item(0,"minecraft:stone",1)); upgrades.putInt("Size",1); upgrades.put("Items",upgradeItems);
         upgradeRoot.getCompound("storageWrapper").getCompound("contents").put("upgradeInventory",upgrades);
-        check(!SophisticatedSources.supported(registries,upgradeRoot), "non-stack upgrade rejected");
+        check(!SophisticatedSources.supported(registries,upgradeRoot,27,16), "non-stack upgrade rejected");
         boolean underflow = false;
-        try { SophisticatedSources.removeContents(registries,root,new ItemStack(Items.DIAMOND),8); }
+        try { SophisticatedSources.removeContents(registries,root,new ItemStack(Items.DIAMOND),8,27,16); }
         catch (IllegalStateException expected) { underflow = true; }
         check(underflow && root.equals(original), "underflow fails without source mutation");
         System.out.println("Sophisticated canonical schema: "+checks+" checks passed (no live storage world)");

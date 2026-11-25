@@ -2,7 +2,7 @@ plugins {
     id 'java-library'
     id 'net.neoforged.moddev' version '2.0.148'
 }
-version = '0.1.1'
+version = '0.1.2'
 group = 'com.pandafoundry'
 base { archivesName = 'foundrybulkcommerce' }
 java {
@@ -27,6 +27,9 @@ neoForge {
             sourceSet = sourceSets.gameTest
             systemProperty 'neoforge.enabledGameTestNamespaces', 'foundrybulkcommerce'
             gameDirectory = file('run-gametest')
+            if (providers.gradleProperty('baselineJar').isPresent()) {
+                systemProperty 'foundrybulkcommerce.baselineJar', providers.gradleProperty('baselineJar').get()
+            }
         }
         integratedTestClient {
             client()

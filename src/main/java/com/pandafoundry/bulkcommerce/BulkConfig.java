@@ -28,8 +28,9 @@ public final class BulkConfig {
                 .define("serverInstanceId", "", value -> value instanceof String text && (text.isEmpty() || text.matches("[A-Za-z0-9_.:-]{1,64}")));
         REQUEST_INTERVAL = builder.comment("Global minimum interval between admitted Sell All requests, including unsuccessful scans.")
                 .defineInRange("requestIntervalMillis", 250, 50, 60000);
-        SCAN_LIMIT = builder.comment("Maximum slot inspections while preparing one request.").defineInRange("maxScannedSlots", 4096, 64, 32768);
-        SNAPSHOT_LIMIT = builder.comment("Maximum total UTF-8 intent payload and scanned NBT bytes per request. Oversized requests fail before mutations.")
+        SCAN_LIMIT = builder.comment("Maximum outer/serialized slot inspections per request; also the ceiling for one container's API-validated inventory capacity.")
+                .defineInRange("maxScannedSlots", 4096, 64, 32768);
+        SNAPSHOT_LIMIT = builder.comment("Separate per-request caps for total scanned binary NBT bytes and final UTF-8 intent bytes. Oversized requests fail before mutations.")
                 .defineInRange("maxSnapshotBytes", 1048576, 16384, 4194304);
         SPEC = builder.build();
     }
