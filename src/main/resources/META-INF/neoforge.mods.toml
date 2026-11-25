@@ -3,7 +3,7 @@ loaderVersion="[4,)"
 license="All Rights Reserved"
 [[mods]]
 modId="foundrybulkcommerce"
-version="0.2.0"
+version="0.2.1"
 displayName="Foundry: Bulk Commerce"
 authors="The Panda Foundry"
 description="Verified bulk selling from hotbar shulkers and optional backpacks through Treasury Sell All."

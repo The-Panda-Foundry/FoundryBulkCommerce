@@ -108,7 +108,7 @@ public final class BulkSales {
             Plan plan = new Plan(id, player, server, ledger, shop, player.level().dimension().location().toString(), pos,
                 template, lotSize, price, quantity, total, List.copyOf(edits), wallet, now, skipped, vanilla, sophisticated, BulkConfig.BACKPACKS.get());
             var record = new LocalLedger.Intent(id, player.getUUID(), player.getGameProfile().getName(), System.currentTimeMillis(), quantity, total, json);
-            feedback(player, "Preparing bulk sale. Reference: " + id, true);
+            if (BulkConfig.SHOW_TRANSACTION_MESSAGES.get()) feedback(player, "Preparing bulk sale. Reference: " + id, true);
             trace(id, "intent submitted items=" + quantity + " spurs=" + total + " sources=" + edits.size());
             ledger.prepare(record).whenComplete((unused, error) -> resume(server, () -> {
                 if (LedgerRuntime.ledger() != ledger) return;
@@ -197,7 +197,7 @@ public final class BulkSales {
             if (needsRecovery) return;
             boolean sold = recordedState.equals("APPLIED_MEMORY");
             if (plan.server.getPlayerList().getPlayer(plan.player.getUUID()) == plan.player) {
-                feedback(plan.player, sold ? "Sold " + plan.quantity + " items for " + plan.payment + " Spurs. Reference: " + plan.id
+                if (!sold || BulkConfig.SHOW_TRANSACTION_MESSAGES.get()) feedback(plan.player, sold ? "Sold " + plan.quantity + " items for " + plan.payment + " Spurs. Reference: " + plan.id
                     : "Sale " + recordedState + ". Reference: " + plan.id, sold);
                 if (plan.skipped > 0) feedback(plan.player, "Skipped " + plan.skipped + " unsupported or duplicate-identity boxes.", false);
                 refresh(plan);
