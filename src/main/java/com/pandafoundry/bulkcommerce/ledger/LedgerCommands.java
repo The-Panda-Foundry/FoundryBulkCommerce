@@ -14,6 +14,7 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 public final class LedgerCommands {
     private LedgerCommands() {}
     public static void register(RegisterCommandsEvent event) {
+        FoundryBulkCommerce.LOGGER.info("[BulkCommerce] Registered /bulkcommerce status, recent, player, inspect and unresolved (permission level 2; read-only)");
         event.getDispatcher().register(Commands.literal("bulkcommerce").requires(source -> source.hasPermission(2))
             .then(Commands.literal("status").executes(context -> {
                 LocalLedger local = LedgerRuntime.ledger();

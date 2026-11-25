@@ -117,6 +117,7 @@ public final class InstalledAdaptersGameTest {
         } catch (ReflectiveOperationException error) { throw new IllegalStateException(error); }
     }
     private static void exercise(GameTestHelper h) {
+        BulkConfig.DEBUG_TRANSACTIONS.set(true); // Test-only: exercise user-configured INFO phase logging.
         var level = h.getLevel();
         var server = level.getServer();
         h.assertTrue(hasHandler(PlayerList.class, "foundry$recoveryGate"), "Admission Mixin applied");

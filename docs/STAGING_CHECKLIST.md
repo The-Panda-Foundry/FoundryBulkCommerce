@@ -1,6 +1,6 @@
 # Staging acceptance checklist
 
-Candidate date: **25 November 2026**. Use a disposable copy and consistent pre-test backup. Never production. Keep the server console available: recovery containment intentionally denies all player login.
+v0.1.1 correction candidate date: **25 November 2026**. Use a disposable copy and consistent pre-test backup. Never production. Keep the server console available: recovery containment intentionally denies all player login.
 
 - [ ] Install the compiled addon on a Java 21 / Minecraft 1.21.1 dedicated NeoForge server with the exact reference JARs and Create dependencies. Confirm SQLite native loading and ledger ready on the staging Linux/CPU/filesystem. Verify a normal full-modpack client **without this addon** can join.
 - [ ] Set a distinct staging serverInstanceId before first ledger creation. Verify non-OP cannot use audit commands; permission-level-two operator and console can. Test status, recent, player UUID history, inspect pages and unresolved.
@@ -14,3 +14,10 @@ Candidate date: **25 November 2026**. Use a disposable copy and consistent pre-t
 - [ ] Verify normal stop/restart with completed transactions does not falsely clear existing recovery flags or reapply a sale. Replace one dependency with a same-version rebuild and confirm admission remains closed; restore the verified original.
 
 Accept only after recording expected/actual item and currency totals, transaction IDs, environment versions, timings and unresolved findings. The supplied automated GameTest verifies Mixins, actual bank overflow, upgraded canonical edits/aliases/rollback/serialization and command permissions; it does not replace these full-client and crash-boundary tests.
+
+## Focused integrated-server regression
+
+- [ ] Follow INTEGRATED_SERVER_FIX.md: v0.1.1 only, full client restart, cheats enabled, physical CLIENT / IntegratedServer diagnostics, status readiness and a vanilla-box-only 64/3-Spur sale.
+- [ ] Enable debugTransactions and confirm bounded request/intent/outcome phase messages; turn it off after diagnosis.
+- [ ] Reopen the world, switch worlds and check separate healthy ledgers; verify recovery containment still blocks the owner when required.
+- [ ] Run NeoForge 21.1.256/full-pack Prism acceptance and a dedicated server with clients lacking the addon. Graphical integrated runtime was blocked in the implementation environment; do not mark this complete from the dedicated GameTest result.

@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.1 — 25 November 2026
+
+- Correct physical-side restrictions: common entry point and common-class Mixins now activate for integrated and dedicated servers. Economic execution remains on the logical server thread.
+- Validate required dependency metadata on both physical distributions when installed, preserving dedicated-server use without requiring the addon on multiplayer clients.
+- Add explicit initialization, command permission, compatibility fingerprint, ledger readiness/blocking and emergency diagnostics.
+- Add `debugTransactions` (default false) for bounded INFO transaction phases, IDs, quantities and outcomes without inventory snapshots.
+- Guard old integrated-world opening callbacks against affecting a subsequent world.
+- Add physical-side regression assertions and Treasury client request-path check; retain all transaction safety tests and add a test-only integrated-client launch fixture.
+- Standard Gradle build and physical dedicated GameTest pass. Graphical integrated runtime is blocked by the execution environment and remains a Prism retest; NeoForge 21.1.256 inputs are not cached here.
+- No ledger schema change, automatic reconciliation, remote integration or production deployment.
+
 ## 0.1.0 MVP revision — 25 November 2026
 
 - Add native SQLite local ledger with FULL WAL commits, immutable transaction UUID/origin IDs, full pre-mutation evidence and durable observed outcomes.

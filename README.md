@@ -1,10 +1,10 @@
 # Foundry: Bulk Commerce
 
-**0.1.0 MVP staging candidate — 25 November 2026.** Minecraft 1.21.1, dedicated NeoForge server, Java 21. Standard Gradle build and a real NeoForge GameTest have passed. Real-player acceptance in the complete server modpack is still required. Nothing has been deployed to production.
+**0.1.1 focused correction — 25 November 2026.** Minecraft 1.21.1, integrated or dedicated NeoForge server, Java 21. Standard Gradle build and a real NeoForge GameTest have passed. Real-player acceptance in the complete server modpack is still required. Nothing has been deployed to production.
 
 Extends **Numismatics Treasury's existing server-shop Sell All** to matching items in carried vanilla and supported Sophisticated Storage shulkers. Treasury retains shop prices, complete lots, access checks and exact item/component matching. Only Sell All is replaced; manual sales, purchases, auctions and transfers retain their original implementation.
 
-Carry your items/boxes, open a BUY_FROM_PLAYER server shop and click Sell All. Each request sells complete lots up to the configured item limit. Preparation and outcome acknowledgement are asynchronous; wait for the transaction reference/result before retrying. Clients need their normal modpack but no Bulk Commerce installation. Integrated singleplayer is outside this version's scope.
+Carry your items/boxes, open a BUY_FROM_PLAYER server shop and click Sell All. Each request sells complete lots up to the configured item limit. Preparation and outcome acknowledgement are asynchronous; wait for the transaction reference/result before retrying. Clients need their normal modpack but no Bulk Commerce installation. Install the addon in the local client modpack when hosting single-player; it operates on that world's logical server. Multiplayer clients do not need this addon when it is installed on the dedicated server.
 
 ## Supported sources
 
@@ -23,7 +23,7 @@ Every carried alias of a duplicate storage UUID is excluded. UUID uniqueness is 
 
 ## Build
 
-Use Java 21 and the included Gradle 9.2.1 wrapper. ModDevGradle 2.0.148 targets NeoForge **21.1.265**. Minimum metadata version 21.1.242 is not a claim of testing every loader version.
+Use Java 21 and the included Gradle 9.2.1 wrapper. ModDevGradle 2.0.148 targets NeoForge **21.1.265** (override for testing with `-PneoForgeVersion=21.1.256`; dependencies must be available). Minimum metadata version 21.1.242 is not a claim of testing every loader version.
 
 Place the original four JARs in `dependencies/`, with these names:
 
@@ -39,7 +39,7 @@ export JAVA_HOME=$(/usr/libexec/java_home -v 21)
 ./gradlew --offline -PdependencyDir=/absolute/path/to/dependencies build
 ```
 
-`build` runs reference hashes, compilation and five executable regression suites through `check`. Gradle's JUnit discovery task has no JUnit tests; the named JavaExec suites are the tests. Output: `build/libs/foundrybulkcommerce-0.1.0.jar` and `-sources.jar`. Original dependency JARs are excluded from Git and distribution. SQLite JDBC **3.51.3.0** is bundled through NeoForge Jar-in-Jar; see THIRD_PARTY_NOTICES.md. No MongoDB dependency is added.
+`build` runs reference hashes, compilation and five executable regression suites through `check`. Gradle's JUnit discovery task has no JUnit tests; the named JavaExec suites are the tests. Output: `build/libs/foundrybulkcommerce-0.1.1.jar` and `-sources.jar`. Original dependency JARs are excluded from Git and distribution. SQLite JDBC **3.51.3.0** is bundled through NeoForge Jar-in-Jar; see THIRD_PARTY_NOTICES.md. No MongoDB dependency is added.
 
 Runtime requires Treasury 1.0.2, Numismatics 1.1.0 and Create 6.0.10–below 6.1.0 with its normal dependencies. Sophisticated Storage/Core are optional at runtime, required for source compilation/reference checks. Exact supplied reference bytes are checked at startup before admitting players (including the Sophisticated pair when installed). Unexpected builds fail closed even when their metadata version is identical.
 
@@ -49,6 +49,8 @@ For the disposable runtime integration test, also supply your own Create JAR:
 ./gradlew -PcreateJar=/absolute/path/to/create-1.21.1-6.0.10.jar runGameTestServer
 ```
 
+A test-only `runIntegratedTestClient` configuration also exists for a copied disposable world; see docs/INTEGRATED_SERVER_FIX.md. It is not included in the production JAR.
+
 Read the game test result log: a successful Gradle exit alone does not prove Minecraft loaded successfully. The test uses a disposable `run-gametest/` world, actual mods and actual Mixins. Do not point development runs at production data. The obsolete hand-packaging fallback was removed; Gradle is the supported build process. Environment-specific offline cache provisioning is documented in docs/VERIFICATION.md.
 
 ## Configuration
@@ -57,6 +59,7 @@ NeoForge generates `<world>/serverconfig/foundrybulkcommerce-server.toml`. Resta
 
 | Key | Default | Range/meaning |
 | --- | --- | --- |
+| `debugTransactions` | false | Opt-in INFO transaction phases, IDs, counts and outcome categories; no snapshots |
 | `enabled` | true | False **refuses Sell All**; it never bypasses the ledger |
 | `vanillaShulkers` | true | Include vanilla shulkers |
 | `sophisticatedShulkers` | true | Include supported Sophisticated sources |
@@ -97,3 +100,21 @@ The ledger cannot make Minecraft player files, Sophisticated SavedData and Numis
 There is no automatic ledger retention. Monitor disk/WAL size, unresolved records and status; retain unresolved evidence indefinitely. At 48 KiB per transaction, 1,000/day is roughly 1.37 GiB per 30 days before indexes/WAL; actual snapshots may be much larger. Resolved records may be archived offline after backup and review. Protect the database/backups as sensitive inventory and balance records. POSIX directory/file permissions are restricted; Windows needs hosting-account ACLs.
 
 See docs/ARCHITECTURE.md for authority, schema and Mixins; docs/VERIFICATION.md for evidence and remaining gaps; docs/STAGING_CHECKLIST.md for acceptance. The original hybrid proposal is retained, explicitly deferred, in docs/FUTURE_HYBRID_ARCHITECTURE.md.
+
+## v0.1.1 integrated-server retest
+
+Replace v0.1.0 with **only** `foundrybulkcommerce-0.1.1.jar` and fully restart Minecraft so the common Mixins can apply. Use a disposable world with cheats enabled (or Open to LAN with cheats), then run **`/bulkcommerce status`**. The bare root has no executor; all subcommands require permission level 2. The normal Sell All button does not require that moderator permission.
+
+Expected log stages, under `[BulkCommerce]`:
+
+1. `0.1.1 initialised on physical CLIENT` in Prism (`DEDICATED_SERVER` on a server process).
+2. `Registered /bulkcommerce ... (permission level 2; read-only)` when server commands are built.
+3. `Starting logical server type=IntegratedServer` (or DedicatedServer).
+4. Four `Compatibility SHA-256 verified` lines when Sophisticated is installed.
+5. `SQLite ledger healthy and ready ... admission=OPEN`, or an explicit recovery/error diagnostic.
+
+Set `debugTransactions = true` in the world's serverconfig TOML and restart the world to see request receipt, planning counts, durable intent, revalidation and durable outcome phases. It defaults false and does not print inventory snapshots. On a multiplayer client without a local world, initialization registers handlers but opens no ledger and performs no transactions locally.
+
+For a controlled first test, configure the server shop to BUY_FROM_PLAYER, stone, **64 items for 3 Spurs**. Carry one vanilla shulker containing exactly 64 stone plus a nonmatching item; keep loose stone out of the inventory. Confirm Sell All, verify 64 stone removed, the other item preserved and exactly 3 Spurs added. Inspect the reference using `/bulkcommerce recent` and `/bulkcommerce inspect <uuid>`. Then save/reload and check persistence. The circuit breaker and all recovery restrictions remain active in single-player too; the owner has no bypass.
+
+The correction and dedicated runtime regression pass. An actual physical-client/integrated runtime launch was attempted but blocked before mod loading by this task environment's macOS graphical-session restrictions. NeoForge 21.1.256/full-pack Prism acceptance therefore remains to be rerun by the architect; see the investigation report for the evidence and boundaries.

@@ -38,8 +38,10 @@ public final class BulkSales {
     public static void sell(ServerPlayer player, JsonObject data) {
         MinecraftServer server = player.getServer();
         if (server == null || !server.isSameThread()) throw new IllegalStateException("Server thread required");
+        trace(null, "received Sell All player=" + player.getUUID());
         long now = System.nanoTime();
         if (!BulkConfig.ENABLED.get() || !LedgerRuntime.admissionOpen() || active != null || now < nextRequest) {
+            trace(null, "admission rejected enabled=" + BulkConfig.ENABLED.get() + " ledgerOpen=" + LedgerRuntime.admissionOpen() + " busy=" + (active != null));
             if (now >= nextBusyNotice) {
                 feedback(player, "Bulk selling is disabled, busy or awaiting ledger recovery. Please try again later.", false);
                 nextBusyNotice = now + TimeUnit.SECONDS.toNanos(1);
@@ -67,6 +69,7 @@ public final class BulkSales {
             long available = 0;
             for (SaleSource source : sources) available = Math.addExact(available, source.available());
             int quantity = Transaction.quantity(available, lotSize, BulkConfig.LIMIT.get());
+            trace(id, "planned available=" + available + " items=" + quantity + " lotSize=" + lotSize + " pricePerLot=" + price + " skippedBoxes=" + skipped);
             if (quantity == 0) throw new IllegalArgumentException("No complete lot fits the stock and transaction limit; skipped boxes: " + skipped);
             int total = Math.multiplyExact(price, quantity / lotSize);
             AccountWallet wallet = new AccountWallet(player, BankService.account(player));
@@ -80,7 +83,7 @@ public final class BulkSales {
             }
             if (remaining != 0) throw new IllegalStateException("Sale plan underflow");
             JsonObject intent = new JsonObject();
-            intent.addProperty("schemaVersion", 1); intent.addProperty("addonVersion", "0.1.0");
+            intent.addProperty("schemaVersion", 1); intent.addProperty("addonVersion", FoundryBulkCommerce.VERSION);
             intent.addProperty("dimension", player.level().dimension().location().toString()); intent.addProperty("shopPosition", pos.asLong());
             intent.addProperty("lotSize", lotSize); intent.addProperty("pricePerLotSpurs", price);
             intent.addProperty("quantity", quantity); intent.addProperty("paymentSpurs", total);
@@ -96,17 +99,19 @@ public final class BulkSales {
                 template, lotSize, price, quantity, total, List.copyOf(edits), wallet, now, skipped, vanilla, sophisticated);
             var record = new LocalLedger.Intent(id, player.getUUID(), player.getGameProfile().getName(), System.currentTimeMillis(), quantity, total, json);
             feedback(player, "Preparing bulk sale. Reference: " + id, true);
+            trace(id, "intent submitted items=" + quantity + " spurs=" + total + " sources=" + edits.size());
             ledger.prepare(record).whenComplete((unused, error) -> resume(server, () -> {
                 if (LedgerRuntime.ledger() != ledger) return;
                 if (error != null) {
                     active = null;
                     FoundryBulkCommerce.LOGGER.error("Intent {} was not acknowledged; no economic mutations authorised", id, error);
                     LedgerRuntime.quarantine(server, "Ledger intent failure " + id);
-                } else apply(plan);
+                } else { trace(id, "intent durable; revalidating on server thread"); apply(plan); }
             }));
         } catch (RuntimeException preparationFailure) {
             active = null;
             FoundryBulkCommerce.LOGGER.debug("Rejected sale preparation {} ({})", id, preparationFailure.getClass().getSimpleName());
+            trace(id, "preparation rejected category=" + preparationFailure.getClass().getSimpleName());
             feedback(player, "Sale not started: check matching stock, supported storage and configured limits. Reference: " + id, false);
         }
     }
@@ -151,6 +156,7 @@ public final class BulkSales {
     }
 
     private static void finish(Plan plan, String state, String detail, boolean recovery) {
+        trace(plan.id, "outcome submitted state=" + state + " recovery=" + recovery);
         JsonObject outcome = new JsonObject();
         outcome.addProperty("state", state); outcome.addProperty("detail", detail); outcome.addProperty("observedAt", System.currentTimeMillis());
         try {
@@ -176,6 +182,7 @@ public final class BulkSales {
                 LedgerRuntime.quarantine(plan.server, "Outcome acknowledgement failure " + plan.id);
                 return;
             }
+            trace(plan.id, "outcome durable state=" + recordedState + " recovery=" + needsRecovery);
             if (needsRecovery) return;
             boolean sold = recordedState.equals("APPLIED_MEMORY");
             if (plan.server.getPlayerList().getPlayer(plan.player.getUUID()) == plan.player) {
@@ -201,6 +208,9 @@ public final class BulkSales {
     }
     private static void feedback(ServerPlayer player, String message, boolean success) {
         player.sendSystemMessage(Component.literal(message).withStyle(success ? ChatFormatting.GREEN : ChatFormatting.RED));
+    }
+    private static void trace(UUID id, String phase) {
+        if (BulkConfig.DEBUG_TRANSACTIONS.get()) FoundryBulkCommerce.LOGGER.info("[BulkCommerce tx {}] {}", id == null ? "request" : id, phase);
     }
     private record Plan(UUID id, ServerPlayer player, MinecraftServer server, LocalLedger ledger, ServerShopBlockEntity shop,
         String dimension, BlockPos pos, ItemStack template, int lotSize, int price, int quantity, int payment,

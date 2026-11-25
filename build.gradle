@@ -2,7 +2,7 @@ plugins {
     id 'java-library'
     id 'net.neoforged.moddev' version '2.0.148'
 }
-version = '0.1.0'
+version = '0.1.1'
 group = 'com.pandafoundry'
 base { archivesName = 'foundrybulkcommerce' }
 java {
@@ -17,7 +17,7 @@ configurations.gameTestCompileOnly.extendsFrom(configurations.compileOnly)
 configurations.gameTestRuntimeOnly.extendsFrom(configurations.runtimeOnly)
 
 neoForge {
-    version = '21.1.265'
+    version = providers.gradleProperty('neoForgeVersion').orElse('21.1.265').get()
     addModdingDependenciesTo(sourceSets.test)
     addModdingDependenciesTo(sourceSets.gameTest)
     runs {
@@ -27,6 +27,16 @@ neoForge {
             sourceSet = sourceSets.gameTest
             systemProperty 'neoforge.enabledGameTestNamespaces', 'foundrybulkcommerce'
             gameDirectory = file('run-gametest')
+        }
+        integratedTestClient {
+            client()
+            sourceSet = sourceSets.gameTest
+            systemProperty 'neoforge.enableGameTest', 'true'
+            systemProperty 'neoforge.enabledGameTestNamespaces', 'foundrybulkcommerce'
+            systemProperty 'foundrybulkcommerce.integratedAcceptance', 'true'
+            gameDirectory = file('run-integrated-test')
+            programArgument '--quickPlaySingleplayer'
+            programArgument 'acceptance'
         }
     }
     mods { foundrybulkcommerce { sourceSet sourceSets.main; sourceSet sourceSets.gameTest } }

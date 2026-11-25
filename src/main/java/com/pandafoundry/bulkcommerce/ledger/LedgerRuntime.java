@@ -26,14 +26,19 @@ public final class LedgerRuntime {
         stopping = false; emergency = false; orderlyLoopExit = false; savesReturned = false;
         BulkSales.reset();
         MinecraftServer server = event.getServer();
+        FoundryBulkCommerce.LOGGER.info("[BulkCommerce] Starting logical server type={}: checking compatibility and opening durable SQLite ledger; admission closed until ready; transactionDebug={}",
+            server.getClass().getSimpleName(), BulkConfig.DEBUG_TRANSACTIONS.get());
         LocalLedger local = new LocalLedger(server.getWorldPath(LevelResource.ROOT).resolve("data/foundrybulkcommerce/ledger.sqlite"), BulkConfig.INSTANCE.get());
         ledger = local;
         try {
             local.open(RuntimeCompatibility.verifier()).whenComplete((health, error) -> {
+                if (ledger != local || stopping) return; // A closed integrated world must not change a subsequent world's readiness.
                 if (error != null) {
                     emergency = true;
                     FoundryBulkCommerce.LOGGER.error("Commerce ledger failed to open; player admission remains closed", error);
-                } else FoundryBulkCommerce.LOGGER.info("Commerce ledger ready: instance={}, recoveryBlocked={}", health.instance(), health.blocked());
+                } else if (health.blocked()) {
+                    FoundryBulkCommerce.LOGGER.warn("[BulkCommerce] Ledger opened but recovery-blocked: instance={}, admission=CLOSED, reason={}", health.instance(), health.problem());
+                } else FoundryBulkCommerce.LOGGER.info("[BulkCommerce] Compatibility verified; SQLite ledger healthy and ready: instance={}, admission=OPEN", health.instance());
             });
         } catch (RuntimeException failure) {
             emergency = true;
@@ -52,6 +57,7 @@ public final class LedgerRuntime {
     }
     public static void quarantine(MinecraftServer server, String reason) {
         emergency = true;
+        FoundryBulkCommerce.LOGGER.error("[BulkCommerce] Emergency containment: {}; disconnecting players and closing admission", reason);
         LocalLedger local = ledger;
         if (local != null) local.trip(reason).exceptionally(error -> {
             FoundryBulkCommerce.LOGGER.error("Could not persist emergency breaker; retain the journal and unclean boot evidence", error);

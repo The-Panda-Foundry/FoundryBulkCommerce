@@ -25,7 +25,25 @@ public final class CompatibilityTest {
         }
     }
     public static void main(String[] args) throws Exception {
+        ClassNode entry = new ClassNode();
+        new ClassReader("com.pandafoundry.bulkcommerce.FoundryBulkCommerce").accept(entry, 0);
+        var mod = entry.visibleAnnotations.stream().filter(a -> a.desc.equals("Lnet/neoforged/fml/common/Mod;")).findFirst().orElseThrow();
+        check(!mod.values.contains("dist"), "entry point must load on both physical sides for integrated servers");
+        try (var stream = CompatibilityTest.class.getResourceAsStream("/foundrybulkcommerce.mixins.json")) {
+            var config = com.google.gson.JsonParser.parseString(new String(stream.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject();
+            check(!config.has("server") && !config.has("client"), "common server-class hooks must not be physically side-restricted");
+            var names = config.getAsJsonArray("mixins").asList().stream().map(com.google.gson.JsonElement::getAsString).toList();
+            check(names.containsAll(List.of("TreasurySellAllMixin", "BankAccountAccessor", "PlayerAdmissionMixin", "ServerShutdownMixin")) && names.size() == 4, "all four integrity hooks load in both distributions");
+        }
         Path deps = Path.of(args[0]);
+        var screen = read(deps.resolve("numismatics_treasury-1.0.2.jar"), "dev/yassou/numismaticstreasury/client/screen/ServerShopScreen");
+        var sellAll = screen.methods.stream().filter(m -> m.name.equals("sellAll")).findFirst().orElseThrow();
+        boolean sendsAction = false, checksLooseStock = false;
+        for (var instruction : sellAll.instructions) if (instruction instanceof MethodInsnNode call) {
+            sendsAction |= call.owner.equals("dev/yassou/numismaticstreasury/network/TreasuryNetwork") && call.name.equals("sendAction");
+            checksLooseStock |= call.name.equals("countMatching");
+        }
+        check(sendsAction && !checksLooseStock, "Treasury Sell All sends the existing action without a loose-stock guard");
         var treasury = read(deps.resolve("numismatics_treasury-1.0.2.jar"), "dev/yassou/numismaticstreasury/network/ServerActionHandler");
         MethodNode trade = treasury.methods.stream().filter(m -> m.name.equals("tradeShop") && m.desc.equals("(Lnet/minecraft/server/level/ServerPlayer;Lcom/google/gson/JsonObject;Z)V")).findFirst().orElseThrow();
         check((trade.access & (Opcodes.ACC_STATIC | Opcodes.ACC_PRIVATE)) == (Opcodes.ACC_STATIC | Opcodes.ACC_PRIVATE), "private static injection target");

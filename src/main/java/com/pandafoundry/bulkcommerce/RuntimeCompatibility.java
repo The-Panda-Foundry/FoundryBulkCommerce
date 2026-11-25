@@ -34,6 +34,7 @@ public final class RuntimeCompatibility {
                 for (int count; (count = stream.read(buffer)) != -1;) digest.update(buffer, 0, count);
                 if (!HexFormat.of().formatHex(digest.digest()).equals(expectedHash))
                     throw new IllegalStateException("Unverified compatibility reference: " + path.getFileName());
+                FoundryBulkCommerce.LOGGER.info("[BulkCommerce] Compatibility SHA-256 verified: {}", path.getFileName());
             } catch (Exception error) { throw new IllegalStateException("Compatibility fingerprint failed: " + path.getFileName(), error); }
         });
     }

@@ -39,3 +39,14 @@
 - Extended GameTest through Treasury's actual Sell All handler: mixed loose/vanilla/upgraded contents paid 12 Spurs for 256 items; a stale second plan cancelled without mutations. Durable rows and clean-stop metadata verified after exit.
 - Retained the original full H1 hybrid proposal as historical/deferred documentation. Updated approved architecture, schema/authority, dependency notices, config/commands, recovery procedure and staging acceptance checklist.
 - Original four dependency JARs are unchanged and excluded from source/Git/distribution. No production connection or deployment. Full-client, complete-modpack, host-native loading, real crash/fault and performance acceptance remain explicitly pending.
+
+## v0.1.1 integrated acceptance correction — 25 November 2026
+
+- Read the supplied Prism acceptance log. Confirmed addon/SQLite discovery and actual integrated-world startup, with no addon initialization/ledger messages in the whole-log search.
+- Established root cause before editing production code: physically dedicated @Mod plus physically server-only Mixin config. Inspected NeoForge side semantics, MixinConfig side selection and IntegratedServer lifecycle/login delegation.
+- Inspected Treasury's actual client screen and action dispatcher: Sell All sends the existing request without a loose-inventory guard; no client interface change required. Commands retain permission level two and their status subcommand.
+- Changed only activation/dependency-side validation, startup diagnostics, optional phase logging and stale integrated-world startup callback protection; bumped version to 0.1.1. All economic/recovery mechanisms remain intact.
+- Added four structural regressions (entry point, common Mixins, all hooks, client request path). Standard Gradle build and dedicated transformed GameTest pass; all 2,403 executable regression checks pass.
+- Added a test-only physical CLIENT quick-play harness using a disposable copy of the prior test world. Attempted actual client launch; macOS graphical-session services failed before mod loading. Interrupted the blocked attempt. No integrated runtime pass is claimed.
+- Tried an offline 21.1.256 build: required NeoForge artifacts are not cached, so that version could not be tested here. Final build/runtime use 21.1.265; a Gradle version override is supplied for exact-version retesting with available dependencies.
+- Original references unchanged, no source changes in the external project, no production deployment. Full Prism integrated acceptance and dedicated client-without-addon handshake remain explicit acceptance gates.

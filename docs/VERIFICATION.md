@@ -1,8 +1,16 @@
-# MVP verification and review disposition
+# Verification and review disposition
 
 Date: **25 November 2026**. Based on reviewed source commit `ca0b30f`; final MVP commit is recorded in the delivery receipt/Git history. Nothing deployed to production; original four JARs remain unmodified and excluded from distribution.
 
-## Executed results
+## Current v0.1.1 correction — 25 November 2026
+
+Root cause and implementation: INTEGRATED_SERVER_FIX.md. Standard Gradle build passed, with **2,403 executable checks** (2,327 transaction + 20 structural/physical-side/request-path + 27 native SQLite + 16 vanilla + 13 Sophisticated). Actual NeoForge **physical DEDICATED_SERVER GameTest passed** with common Mixins and mixed async selling/stale cancellation. Diagnostics and opt-in phase logs were observed. Java 21, NeoForge 21.1.265; SQLite supplied via the same temporary local Maven override described below. Production JAR inspection confirms Java 21 class version, v0.1.1 metadata, common four-Mixin list, nested SQLite, and no client-test/GameTest classes.
+
+**Not established:** actual physical CLIENT/integrated runtime. Its graphical launch was attempted but macOS service access failed before addon loading; the attempt was interrupted. A 21.1.256 offline build was also attempted but its NeoForge artifacts are uncached. Neither attempt is reported as a successful runtime/build. Full-pack Prism 21.1.256, real-client Sell All, world switching and absent-addon multiplayer handshake require acceptance. All prior crash atomicity and host performance limits remain.
+
+Current artifact `foundrybulkcommerce-0.1.1.jar` SHA-256: `372c9e8e623b521b9041553c81208cecea3b73cc6b8af131600576019454e1ea`. SQLite schema remains 1 and all safety mechanisms are retained. The remaining sections preserve the original v0.1.0 baseline evidence; their artifact hash/counts are historical.
+
+## Historical v0.1.0 baseline results
 
 | Check | Result |
 | --- | --- |
@@ -63,7 +71,7 @@ A clean build/GameTest also passed before the final revalidation/test additions;
 - No standalone moderator permission node; commands use OP level 2/console.
 - Original external source directory remains read-only. The complete implementation and Git history are in the delivered source project; import into a writable local checkout.
 
-## Compiled artifact
+## Historical v0.1.0 compiled artifact
 
 `foundrybulkcommerce-0.1.0.jar` SHA-256: `ecb76347d61cc27418aaf3986ed147300f98762d67a15ea97215c7551b09c336`.
 

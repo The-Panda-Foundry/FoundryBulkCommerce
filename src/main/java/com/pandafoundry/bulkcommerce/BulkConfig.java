@@ -12,9 +12,12 @@ public final class BulkConfig {
     public static final ModConfigSpec.IntValue REQUEST_INTERVAL;
     public static final ModConfigSpec.IntValue SCAN_LIMIT;
     public static final ModConfigSpec.IntValue SNAPSHOT_LIMIT;
+    public static final ModConfigSpec.BooleanValue DEBUG_TRANSACTIONS;
     static {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
         ENABLED = builder.comment("Enable bulk Sell All. False refuses Sell All rather than bypassing the ledger.").define("enabled", true);
+        DEBUG_TRANSACTIONS = builder.comment("Log transaction phases at INFO for diagnosis. Includes IDs, quantities and outcome categories; never full inventory snapshots.")
+                .define("debugTransactions", false);
         VANILLA = builder.comment("Include carried vanilla shulker boxes.").define("vanillaShulkers", true);
         SOPHISTICATED = builder.comment("Include supported Sophisticated Storage shulkers if installed.").define("sophisticatedShulkers", true);
         LIMIT = builder.comment("Maximum individual items per Sell All request, including loose items. Complete lots only.",
