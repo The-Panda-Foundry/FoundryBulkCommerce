@@ -1,0 +1,84 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.148'
+}
+version = '0.1.0'
+group = 'com.pandafoundry'
+base { archivesName = 'foundrybulkcommerce' }
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+    withSourcesJar()
+}
+neoForge {
+    version = '21.1.265'
+    addModdingDependenciesTo(sourceSets.test)
+    runs {
+        server { server(); programArgument '--nogui' }
+    }
+    mods { foundrybulkcommerce { sourceSet sourceSets.main } }
+}
+def dependencyDirectory = providers.gradleProperty('dependencyDir').orElse('dependencies')
+dependencies {
+    compileOnly fileTree(dir: dependencyDirectory.get(), include: ['*.jar'])
+    testImplementation fileTree(dir: dependencyDirectory.get(), include: ['*.jar'])
+    localRuntime fileTree(dir: dependencyDirectory.get(), include: ['*.jar'])
+}
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8'; options.release = 21 }
+tasks.withType(AbstractArchiveTask).configureEach {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+}
+tasks.register('integrityTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.pandafoundry.bulkcommerce.transaction.TransactionTest'
+}
+tasks.register('compatibilityTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.pandafoundry.bulkcommerce.CompatibilityTest'
+    args file(dependencyDirectory.get()).absolutePath
+}
+tasks.register('vanillaAdapterTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.pandafoundry.bulkcommerce.storage.VanillaTest'
+}
+tasks.register('sophisticatedSchemaTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.pandafoundry.bulkcommerce.storage.SophisticatedSchemaTest'
+}
+tasks.withType(JavaExec).configureEach {
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
+}
+tasks.named('check') { dependsOn 'integrityTest', 'compatibilityTest', 'vanillaAdapterTest', 'sophisticatedSchemaTest' }
+
+def referenceHashes = [
+    'CreateNumismatics-1.1.0+neoforge-mc1.21.1.jar': 'd33a33b46f923462ae6806a024851afaefa473ced0e95bf405f8ebc13abce767',
+    'numismatics_treasury-1.0.2.jar': 'fde8264ff0e17792b6160e6c41c6ea0b19e5de1343ddddcdf13b5a0bddba46e2',
+    'sophisticatedcore-1.21.1-1.5.7.2381.jar': '33ff373cd62e2bef84ca5dd18ffea1c7508842a3156d021f1a0101063f69fb39',
+    'sophisticatedstorage-1.21.1-1.6.2.2159.jar': 'bd6cfe04f5062e1ac860f0e8e858185f037b3a20ef3ee387c8f895839781ac69'
+]
+tasks.register('verifyCompatibilityReferences') {
+    inputs.files(referenceHashes.keySet().collect { new File(file(dependencyDirectory.get()), it) })
+    doLast {
+        referenceHashes.each { name, expected ->
+            def reference = new File(file(dependencyDirectory.get()), name)
+            if (!reference.isFile()) throw new GradleException("Missing compatibility reference: ${reference}")
+            def digest = java.security.MessageDigest.getInstance('SHA-256')
+            reference.withInputStream { stream ->
+                byte[] buffer = new byte[65536]
+                int count
+                while ((count = stream.read(buffer)) != -1) digest.update(buffer, 0, count)
+            }
+            if (digest.digest().encodeHex().toString() != expected)
+                throw new GradleException("Compatibility reference differs: ${name}")
+        }
+    }
+}
+tasks.named('compileJava') { dependsOn 'verifyCompatibilityReferences' }
+
+tasks.named('jar') {
+    manifest.attributes('FMLModType': 'MOD', 'Implementation-Title': 'Foundry Bulk Commerce', 'Implementation-Version': project.version)
+}
