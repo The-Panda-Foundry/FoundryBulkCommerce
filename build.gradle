@@ -55,7 +55,13 @@ dependencies {
     }
     compileOnly fileTree(dir: dependencyDirectory.get(), include: ['*.jar'])
     testImplementation fileTree(dir: dependencyDirectory.get(), include: ['*.jar'])
-    runtimeOnly fileTree(dir: dependencyDirectory.get(), include: ['*.jar'])
+    // Optional integrations are controlled below, even when all references share dependencies/.
+    runtimeOnly files([
+        'CreateNumismatics-1.1.0+neoforge-mc1.21.1.jar',
+        'numismatics_treasury-1.0.2.jar',
+        'sophisticatedcore-1.21.1-1.5.7.2381.jar',
+        'sophisticatedstorage-1.21.1-1.6.2.2159.jar'
+    ].collect { new File(file(dependencyDirectory.get()), it) })
     def backpackJar = providers.gradleProperty('backpacksJar').orElse('dependencies/sophisticatedbackpacks-1.21.1-3.26.9.2195.jar')
     def curiosJar = providers.gradleProperty('curiosJar').orElse('dependencies/curios-neoforge-9.5.1+1.21.1.jar')
     def accessoriesJar=providers.gradleProperty('accessoriesJar').orElse('dependencies/accessories-neoforge-1.1.0-beta.53+1.21.1.jar')
