@@ -47,7 +47,7 @@ public final class VanillaTest {
         boxed.restore(); loose.restore();
         check(loose.isBefore() && boxed.isBefore(), "exact rollback");
         inventory.setItem(40, box.copy());
-        check(VanillaSources.collect(inventory,template,true,registries).stream().mapToLong(SaleSource::available).sum() == 180, "offhand shulkers supported");
+        check(VanillaSources.collect(inventory,template,true,registries).stream().mapToLong(SaleSource::available).sum() == 96, "offhand shulkers are protected");
         check(VanillaSources.collect(inventory,template,false,registries).size() == 1, "container configuration switch");
         check(!ItemPolicy.saleable(box) && !ItemPolicy.saleable(new ItemStack(Items.BUNDLE)), "nested and container template exclusion");
         NonNullList<ItemStack> invalid = NonNullList.withSize(28, ItemStack.EMPTY);
@@ -76,6 +76,15 @@ public final class VanillaTest {
         try { ScanBudget budget = new ScanBudget(1, 1000); budget.slot(); budget.slot(); }
         catch (IllegalStateException expected) { slotLimited = true; }
         check(slotLimited, "M2 slot budget bounds inspections");
+        inventory.clearContent();
+        for (int slot=0;slot<9;slot++) inventory.setItem(slot,persistedBox.copy());
+        inventory.setItem(9,persistedBox.copy()); inventory.setItem(40,persistedBox.copy());
+        check(VanillaSources.collect(inventory,template,true,registries).size()==9,"all nine hotbar slots eligible; protected inventory/offhand excluded");
+        inventory.setItem(10,new ItemStack(Items.STONE,64));
+        check(VanillaSources.collect(inventory,template,true,registries).size()==10,"ordinary loose items outside hotbar retain Treasury behaviour");
+        var moving = VanillaSources.collect(inventory,template,true,registries).getFirst().remove(1);
+        inventory.setItem(20,inventory.getItem(0)); inventory.setItem(0,ItemStack.EMPTY);
+        check(!moving.isBefore(),"vanilla box moved to protected inventory invalidates plan");
         System.out.println("Vanilla adapter: "+checks+" checks passed");
     }
 }

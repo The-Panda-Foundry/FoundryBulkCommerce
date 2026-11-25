@@ -74,6 +74,13 @@ public final class ShulkerCompatibilityGameTest {
             var duplicates=SophisticatedSources.collect(player,template);
             check(h,duplicates.sources().isEmpty()&&duplicates.rejections().size()==2&&duplicates.rejections().stream().allMatch(r->r.reason()==SaleRejection.Reason.DUPLICATE_UUID),"Both aliases rejected with exact diagnostic");
             player.getInventory().setItem(1,ItemStack.EMPTY);
+            player.getInventory().setItem(20,box.copy());
+            check(h,SophisticatedSources.collect(player,template).sources().isEmpty(),"Protected main-inventory alias blocks shulker");
+            player.getInventory().setItem(20,box);player.getInventory().setItem(0,ItemStack.EMPTY);
+            var protectedBudget=new ScanBudget(4096,1);
+            check(h,SophisticatedSources.collect(player,template,protectedBudget).sources().isEmpty()&&protectedBudget.bytes()==0,"Protected shulker contents not serialized");
+            player.getInventory().setItem(20,ItemStack.EMPTY);player.getInventory().setItem(0,box);
+
             handler=wrapper.getInventoryHandler();
             for(int s=0;s<slots;s++)handler.setStackInSlot(s,ItemStack.EMPTY);
             for(var upgrade:stackUpgrades) {
