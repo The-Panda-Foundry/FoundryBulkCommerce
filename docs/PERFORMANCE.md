@@ -1,3 +1,30 @@
+# v0.2.0 performance evidence
+
+Recorded **25 November 2026**. macOS ARM64 / Apple M4 Pro, Temurin Java 21.0.12, NeoForge 21.1.265, actual reference mods including Backpacks, Curios, Accessories and its normal Owo dependency. These are development measurements, not hosted Linux/full-modpack MSPT results.
+
+## Backpack capture, partial planning and evidence
+
+BackpackPerformanceGameTest fills actual 120-slot Netherite backpacks via native wrappers. Every slot holds Integer.MAX_VALUE wheat with Omega installed. One backpack contains 257,698,037,640 wheat; four contain 1,030,792,150,560. Each operation captures sources, counts stock with long arithmetic and prepares partial removal/evidence for a 230,400-item ceiling. The timed section does not apply edits, mutate/pay, perform SQL or encode the final combined intent JSON. Identity inspection includes installed equipment APIs. Twelve warmups precede 40 timed samples per scenario. Middle sorted sample and approximately p95 are reported; no pass/fail timing threshold.
+
+| Hotbar backpacks | Middle ms | Approx. p95 ms | Planning inspections | Scanned binary NBT bytes |
+| --- | ---: | ---: | ---: | ---: |
+| 1 Netherite + Omega | 0.245416 | 0.295084 | 212 | 5,755 |
+| 4 Netherite + Omega | 0.512041 | 0.568834 | 575 | 23,020 |
+
+These values are from the final all-equipped rerun after test-only optional-discovery isolation. JIT/order/host noise remains. Byte counts describe serialized input, not peak/retained heap or all temporary allocations. No claims of zero allocation or guaranteed submillisecond server cost are made.
+
+HotbarTransactionsGameTest separately exercises real Treasury/Mixins, native SQLite intent/outcome and bank settlement for mixed backpack/Storage/vanilla/loose sources. Two repeated successful requests each remove 230,400 items, then two asynchronous stale plans cancel (movement and newly introduced alias). Protected and nested contents remain unchanged. Existing NetheriteTransactionsGameTest also interleaves a second player's request while the first is pending; admission rejects it with no economic mutation. Neither is a real concurrent-player network/load profile.
+
+Default work/byte budgets, one globally active transaction, bounded SQL queue and 250-ms admission interval remain unchanged. No per-item loops, persistent inventory cache, ticks or equipment polling are introduced. Each mutation validation performs fresh bounded identity checks; timings above cover planning only, so actual settlement adds full canonical comparisons, per-edit identity checks and account validation. SQL/FULL durability operations stay off the server thread, but disk contention and callback tick scheduling affect total response time.
+
+Measure actual full-pack MSPT, p95/p99 request latency, main-thread preparation/settlement, heap/GC, local commit latency, disk/WAL pressure and concurrent player admission on staging. Component-heavy stored items can be more expensive than wheat. Scan/byte budgets bound accepted work/data, not arbitrary third-party component codec execution time. Do not raise protective limits from these microbenchmarks alone.
+
+## Reproduction
+
+Run runGameTestServer using README's exact integration properties; inspect [BC020 performance] lines plus required-test success. The benchmark fixtures live only in src/gameTest and are excluded from the addon. No production fixture command or utility was introduced. Measurements below are retained historical v0.1.2 evidence, not a like-for-like v0.2.0 comparison (eligibility and identity work changed).
+
+---
+
 # Local v0.1.2 performance measurements
 
 Recorded **25 November 2026** on macOS ARM64 / Apple M4 Pro, Temurin Java 21.0.12, Minecraft 1.21.1 and NeoForge 21.1.265, with Create 6.0.10 and the exact four compatibility references. These are automated headless development measurements, **not full Panda Foundry load/MSPT or hosted Linux results**.

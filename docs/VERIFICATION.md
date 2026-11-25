@@ -1,5 +1,30 @@
 # Verification and review disposition
 
+## Current v0.2.0 release candidate — 25 November 2026
+
+- Accepted v0.1.2 baseline preserved before edits: `25505d80e5d3621eb96d02bf3448d8fbd908f35a`, tag `baseline/v0.1.2`. Original dependency archives remain unmodified and excluded from source/distribution.
+- Standard Java 21 / ModDevGradle clean build passes: **2,406 executable checks** (2,327 transaction + 20 compatibility + 27 native SQLite + 19 vanilla + 13 schema). The Gradle JUnit discovery task intentionally has no JUnit tests.
+- **Nine required actual NeoForge GameTests pass** with Backpacks, Curios and Accessories loaded: the existing four adapter/shulker matrix/performance/real transaction tests, plus backpack matrix, Curios aliases, Accessories aliases, mixed hotbar async transactions and backpack performance. Storage matrix: 443 explicit assertions; Backpacks: 224, all six tiers × nine modifiers plus combinations/preservation/rejections.
+- Mixed actual Treasury/SQLite transactions remove 230,400 items twice from stock above signed-int aggregate range; two subsequent pending plans cancel for hotbar movement and a newly introduced protected alias. Protected main/offhand/nested contents and installed metadata remain unchanged; durable rows/references and exact bank deltas are checked.
+- Runtime without Backpacks, Curios or Accessories also passes. Four base tests exercise actual shulker functionality; five optional tests return early rather than claiming backpack/equipment coverage. GameTest discovery originally exposed optional synthetic-lambda signatures; test-only installed helpers now isolate them, verified in this absent run. Production optional adapters already use separate guarded classes.
+- Both equipment APIs loaded: real active/cosmetic aliases block eligible backpack sources; equipped-only collection decodes zero content bytes. Equal UUID values across independent Storage/Backpacks repositories are accepted, within-repository aliases remain excluded. Unknown providers and third-party mirrored equipment bridges are unverified.
+- Runtime toolchain: Temurin 21.0.12/macOS ARM64, Minecraft 1.21.1, NeoForge **21.1.265**, Gradle 9.2.1, ModDevGradle 2.0.148. An exact 21.1.256 offline artifact attempt failed because that version is absent from the cache; this is a documented environmental blocker, not a successful exact-loader test. Existing Gradle cache and the temporary local SQLite Maven repository were reused; no fallback compiler/packager.
+- No OS kill/power-loss/disk-full/full-modpack/client handshake test is claimed. Full integrated v0.2.0, dedicated Linux 21.1.256, native SQLite host behaviour, real-player contention/MSPT and crash/manual-reconciliation gates remain outstanding. v0.1.2 integrated stress acceptance is user-reported; it does not certify new paths.
+- The four common Mixins, bank/ledger schema and safety mechanisms are unchanged. No new networking, client class requirement, tick processing or persistent inventory cache. See V0_2_0_COMPATIBILITY.md and PERFORMANCE.md. Source commits and final artifact SHA-256 are in the release receipt/Git history. Production source: `050d6c7`; regression source: `3603ff7`. Production JAR SHA-256: `81847f9e3a2eb20b44c0c0951bdec4c83473c9520e9327b1116972a08728dbd0`; Java class major 65. Archive inspection verifies 45 addon classes, no foreign mod/test classes, and unchanged exact nested SQLite.
+
+### New exact reference fingerprints
+
+| Archive | SHA-256 |
+| --- | --- |
+| sophisticatedbackpacks-1.21.1-3.26.9.2195.jar | de4a51eb3757ee273b56a41620d6598cd3af8578a5a02c4b5a784e42ab4bee2b |
+| curios-neoforge-9.5.1+1.21.1.jar | a45df2125c26219974aba7507ffc9afe7b83acc941a386af3faacb1cc0056fde |
+| accessories-neoforge-1.1.0-beta.53+1.21.1.jar | 10017a3da78ea63e9ece27a1ca32f8cf490362f348778cf8cb759e7282f3beb0 |
+
+All three are required compile references and individually optional at runtime; installed copies are hashed off-thread at startup regardless of adapter enable flags. Their normal dependent mods still apply (Accessories runtime tests used Owo 0.12.15.5-beta.1+1.21). README documents property overrides and present/absent commands; the original four hashes below remain unchanged. Runtime inputs explicitly select the original four; optional integrations use the documented flags even when compile archives share one directory.
+
+The remaining sections preserve historical evidence; their versions, artifact hashes and outstanding-at-delivery statements are not current v0.2.0 results.
+
+
 Date: **25 November 2026**. Based on reviewed source commit `ca0b30f`; final MVP commit is recorded in the delivery receipt/Git history. Nothing deployed to production; original four JARs remain unmodified and excluded from distribution.
 
 ## Current v0.1.2 release candidate — 25 November 2026

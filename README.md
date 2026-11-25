@@ -1,128 +1,83 @@
 # Foundry: Bulk Commerce
 
-**0.1.2 release candidate — 25 November 2026.** Minecraft 1.21.1, integrated or dedicated NeoForge server, Java 21. Standard Gradle build and a real NeoForge GameTest have passed. The architect confirmed v0.1.1 integrated acceptance on 21.1.256. This v0.1.2 candidate still requires full-pack and dedicated staging acceptance. Nothing has been deployed to production.
+**v0.2.0 release candidate — 25 November 2026.** Minecraft 1.21.1, Java 21, NeoForge; integrated and dedicated logical servers. Extends Treasury's existing BUY_FROM_PLAYER server-shop **Sell All**. No production deployment has occurred.
 
-Extends **Numismatics Treasury's existing server-shop Sell All** to matching items in carried vanilla and supported Sophisticated Storage shulkers. Treasury retains shop prices, complete lots, access checks and exact item/component matching. Only Sell All is replaced; manual sales, purchases, auctions and transfers retain their original implementation.
+Put eligible containers in **any of hotbar slots 0–8**, open the existing Treasury interface and click Sell All. The selected slot does not matter. Containers in the remaining inventory, offhand, armour, Curios and Accessories are protected. Loose matching items retain Treasury's ordinary main-inventory behaviour (slots 0–35). Nested containers are never traversed or sold as commodities.
 
-Carry your items/boxes, open a BUY_FROM_PLAYER server shop and click Sell All. Each request sells complete lots up to the configured item limit. Preparation and outcome acknowledgement are asynchronous; wait for the transaction reference/result before retrying. Clients need their normal modpack but no Bulk Commerce installation. Install the addon in the local client modpack when hosting single-player; it operates on that world's logical server. Multiplayer clients do not need this addon when it is installed on the dedicated server.
+This deliberately changes v0.1.2 container eligibility. Preserve your existing transaction-limit settings: the default remains 2,304; the accepted stress-test setting was 230,400. Treasury's maximum configurable shop bundle remains 2,304. A sale can contain multiple complete bundles, up to the Bulk Commerce limit; excess stock remains in its source.
 
-## Supported sources
+## Compatibility
 
-| Source | Support |
+| Source | Extraction |
 | --- | --- |
-| Loose main inventory/hotbar | Same slots and comparison as Treasury |
-| Vanilla shulkers | Vanilla inventory, including offhand; one box per slot |
-| Sophisticated Storage shulkers | Modern UUID-backed canonical finite storage; API capacity and configured work limits |
-| Stack upgrades | All seven registered upgrades plus three passive downgrades; mixed/repeated finite modifiers and positive integer counts |
-| Other upgrades/partitions | Excluded, including disabled non-stack upgrades and infinite/creative partitions |
-| Linked storage, backpacks, placed containers | Excluded |
-| Nested containers | Never traversed or sold as commodities |
-| Loose offhand/armor, Curios, other inventories | Not sold |
+| Vanilla shulker boxes | Hotbar only, all colours, 27 slots |
+| Sophisticated Storage 1.6.2.2159 | All six shulker tiers; supported passive stack modifiers |
+| Sophisticated Backpacks 3.26.9.2195 | Optional; all six backpack tiers; nine passive stack modifiers including Omega |
+| Equipped, offhand, main-inventory containers outside hotbar | Identity checks only; contents never decoded for sale |
+| Linked/remote, placed, nested, legacy embedded storage | Excluded |
+| Non-stack processing upgrades, creative/infinite partitions, unverified layouts | Excluded safely |
 
-Every carried alias of a duplicate storage UUID is excluded. UUID uniqueness is checked again before mutation. Legacy embedded Sophisticated storage is skipped rather than migrated. Sale templates with container/bundle/block-entity data, storage identities, backpack names, or items that cannot fit inside containers are excluded. Ordinary signs and enchanting tables are supported; block-entity block types alone are no longer rejected.
+[Complete shulker/backpack capacity and upgrade matrix](docs/V0_2_0_COMPATIBILITY.md). Uses the actual canonical Sophisticated repositories, API capacities and modern saved components. No hardcoded production tier/item allowlist. Full identity/upgrade/settings/metadata preservation is verified before payment. Unknown dependency builds fail closed by exact SHA-256, even when their version strings match.
 
-## Build
+Storage and Backpacks use independent SavedData repositories. Identities are **repository + UUID**. Duplicate occurrences within a repository exclude every alias. Identity inspection covers vanilla inventory/armour/offhand, cursor and installed supported Curios/Accessories active/cosmetic slots; it is independent of extraction eligibility and repeated before mutation. Unknown third-party equipment providers and recursive nested identities are not inspected. Third-party equipment bridges mirroring one physical slot into both APIs are unverified and may conservatively reject it as a duplicate.
 
-Use Java 21 and the included Gradle 9.2.1 wrapper. ModDevGradle 2.0.148 targets NeoForge **21.1.265** (override for testing with `-PneoForgeVersion=21.1.256`; dependencies must be available). Minimum metadata version 21.1.242 is not a claim of testing every loader version.
+## Installation and configuration
 
-Place the original four JARs in `dependencies/`, with these names:
+Dedicated server: replace the old addon with **only** `foundrybulkcommerce-0.2.0.jar` and restart. Multiplayer clients need their normal modpack, **without needing Bulk Commerce**. Single-player hosts install the addon locally; its logical server handles transactions. No new screens, packets or client registry entries are introduced. Real absent-addon client handshake and full-pack v0.2.0 gameplay remain staging gates.
 
-- `CreateNumismatics-1.1.0+neoforge-mc1.21.1.jar`
-- `numismatics_treasury-1.0.2.jar`
-- `sophisticatedcore-1.21.1-1.5.7.2381.jar`
-- `sophisticatedstorage-1.21.1-1.6.2.2159.jar`
+Required economy references: Treasury 1.0.2, Create Numismatics 1.1.0 and their usual Create dependencies. Optional integrations: exact Storage/Core, Backpacks, Curios 9.5.1 and Accessories 1.1.0-beta.53 reference builds. The addon does not supply those mods. SQLite JDBC 3.51.3.0 is bundled via NeoForge Jar-in-Jar; see [notices](THIRD_PARTY_NOTICES.md).
+
+Configuration: `<world>/serverconfig/foundrybulkcommerce-server.toml`. Existing settings are retained; new `sophisticatedBackpacks=true` enables the adapter only when that mod is installed. Hotbar eligibility is mandatory. Defaults: `bulkTransactionLimit=2304`, `maxScannedSlots=4096`, `maxSnapshotBytes=1048576`, `requestIntervalMillis=250`, `debugTransactions=false`. [All settings and distinct limits](docs/CONFIGURATION.md).
+
+One globally active transaction and a cooldown bound admission; work is per slot/stack, never per individual item. No continuous scanning, tick listener or persistent inventory cache is added. Protected containers receive lightweight UUID inspection only. Database operations and fingerprint IO run on the bounded ledger worker; server-thread continuations revalidate positions, identities, shop access, prices, inventory and account state before mutation.
+
+## Ledger and operations
+
+Local ledger: `<world>/data/foundrybulkcommerce/ledger.sqlite` with WAL/SHM and process lock. Use persistent local disk, a unique server instance ID and a separate staging world/ledger. Durable intent precedes economic mutation; every removal is verified before credit. Checked arithmetic, exact component matching, compensation verification, persistent breaker and conservative crash containment remain unchanged. Backpack sources are explicitly identified in transaction evidence.
+
+| Read-only command (OP level 2 or console) | Result |
+| --- | --- |
+| `/bulkcommerce status` | Readiness, breaker, instance and queue |
+| `/bulkcommerce recent [limit]` | Latest 10; maximum 25 |
+| `/bulkcommerce player <uuid> [limit]` | Player history |
+| `/bulkcommerce unresolved` | Latest 25 unresolved records |
+| `/bulkcommerce inspect <transaction-uuid> [page]` | Outcome and paginated evidence |
+
+Startup logs confirm physical side, command registration, logical server, exact dependency fingerprints and ledger readiness. Enable transaction debug logging for bounded rejection/phase diagnostics; full inventory snapshots are not printed. Sell All does not require moderator permission.
+
+**The ledger does not provide atomic persistence across Minecraft, either Sophisticated repository and Numismatics.** Outcomes such as APPLIED_MEMORY describe verified memory, not coordinated resource saves. Unclean boots/uncertain outcomes trigger persistent manual-recovery containment. Admission is closed until ready; live emergencies disconnect players and block new logins. No automatic replay/refund or breaker-reset command exists. Never bypass recovery by deleting the ledger/removing the addon. [Architecture](docs/ARCHITECTURE.md) · [manual recovery](docs/RECOVERY.md).
+
+No automatic retention: monitor free disk/WAL growth, unresolved records and host latency. Retain unresolved evidence; archive resolved records offline only after consistent backup and review. Ledger/backups contain sensitive inventory/account evidence. At 48 KiB/record, 1,000 transactions/day is about 1.37 GiB/month before indexes/WAL; large snapshots can cost more. The future hybrid SQLite/MongoDB proposal remains [documented and deferred](docs/FUTURE_HYBRID_ARCHITECTURE.md).
+
+## Build and test
+
+Use Java 21 and the Gradle 9.2.1 wrapper. Default ModDevGradle 2.0.148 runtime is NeoForge **21.1.265**, the cached version actually tested here. Override with `-PneoForgeVersion=21.1.256` when those dependencies are available. Metadata minimum 21.1.242 is not a claim of testing every loader version.
+
+Place the original four reference JARs plus the three optional-integration compile references in `dependencies/`:
+
+```text
+CreateNumismatics-1.1.0+neoforge-mc1.21.1.jar
+numismatics_treasury-1.0.2.jar
+sophisticatedcore-1.21.1-1.5.7.2381.jar
+sophisticatedstorage-1.21.1-1.6.2.2159.jar
+sophisticatedbackpacks-1.21.1-3.26.9.2195.jar
+curios-neoforge-9.5.1+1.21.1.jar
+accessories-neoforge-1.1.0-beta.53+1.21.1.jar
+```
 
 ```sh
 export JAVA_HOME=$(/usr/libexec/java_home -v 21)
 ./gradlew build
-# Existing populated cache:
-./gradlew --offline -PdependencyDir=/absolute/path/to/dependencies build
+./gradlew -PcreateJar=/absolute/path/create-1.21.1-6.0.10.jar runGameTestServer
+# Equipped integrations additionally need their normal runtime dependencies:
+./gradlew -PcreateJar=/absolute/path/create.jar -PwithCurios -PwithAccessories \
+  -PowoJar=/absolute/path/owo-lib-neoforge-0.12.15.5-beta.1+1.21.jar runGameTestServer
+# Same compiled source, without Backpacks/Curios/Accessories at runtime:
+./gradlew -PcreateJar=/absolute/path/create.jar -PwithoutBackpacks runGameTestServer
 ```
 
-`build` runs reference hashes, compilation and five executable regression suites through `check`. Gradle's JUnit discovery task has no JUnit tests; the named JavaExec suites are the tests. Output: `build/libs/foundrybulkcommerce-0.1.2.jar` and `-sources.jar`. Original dependency JARs are excluded from Git and distribution. SQLite JDBC **3.51.3.0** is bundled through NeoForge Jar-in-Jar; see THIRD_PARTY_NOTICES.md. No MongoDB dependency is added.
+Override paths with `-PdependencyDir=...` (original four), `-PbackpacksJar=...`, `-PcuriosJar=...`, `-PaccessoriesJar=...`. Optional APIs are required to compile their adapters, not to run the production addon. Optional runtime flags remain effective when all compile references share dependencies/. `--offline` reuses a populated Gradle cache. No originals are modified, tracked or redistributed.
 
-Runtime requires Treasury 1.0.2, Numismatics 1.1.0 and Create 6.0.10–below 6.1.0 with its normal dependencies. Sophisticated Storage/Core are optional at runtime, required for source compilation/reference checks. Exact supplied reference bytes are checked at startup before admitting players (including the Sophisticated pair when installed). Unexpected builds fail closed even when their metadata version is identical.
+`build` invokes five executable JavaExec suites through `check` (2,406 checks), rather than JUnit tests. GameTests additionally load actual mods/Mixins, bank, canonical repositories and native SQLite. Read actual required-test success lines, not just Gradle's exit. Output: `build/libs/foundrybulkcommerce-0.2.0.jar` and sources JAR. Test-only fixtures are never packaged in the production addon. Development run worlds are disposable; never use production data.
 
-For the disposable runtime integration test, also supply your own Create JAR:
-
-```sh
-./gradlew -PcreateJar=/absolute/path/to/create-1.21.1-6.0.10.jar runGameTestServer
-```
-
-A test-only `runIntegratedTestClient` configuration also exists for a copied disposable world; see docs/INTEGRATED_SERVER_FIX.md. It is not included in the production JAR.
-
-Read the game test result log: a successful Gradle exit alone does not prove Minecraft loaded successfully. The test uses a disposable `run-gametest/` world, actual mods and actual Mixins. Do not point development runs at production data. The obsolete hand-packaging fallback was removed; Gradle is the supported build process. Environment-specific offline cache provisioning is documented in docs/VERIFICATION.md.
-
-## Configuration
-
-NeoForge generates `<world>/serverconfig/foundrybulkcommerce-server.toml`. Restart after edits for repeatable staging tests.
-
-| Key | Default | Range/meaning |
-| --- | --- | --- |
-| `debugTransactions` | false | Opt-in INFO transaction phases, IDs, counts and outcome categories; no snapshots |
-| `enabled` | true | False **refuses Sell All**; it never bypasses the ledger |
-| `vanillaShulkers` | true | Include vanilla shulkers |
-| `sophisticatedShulkers` | true | Include supported Sophisticated sources |
-| `bulkTransactionLimit` | 2304 | Individual items including loose stock; 1–1,048,576; whole lots only |
-| `serverInstanceId` | empty | Generate/persist a UUID; or set 1–64 letters/digits/`_.:-` before first use |
-| `requestIntervalMillis` | 250 | Global admission interval; 50–60,000 ms |
-| `maxScannedSlots` | 4096 | Planning slot inspections; 64–32,768 |
-| `maxSnapshotBytes` | 1,048,576 | Scanned NBT budget and final UTF-8 intent cap, separately enforced; 16,384–4,194,304 |
-
-One transaction globally remains active through durable outcome acknowledgement. Preparations expire after 30 seconds. Prices use checked int multiplication; combined standard/reserve funds use checked long arithmetic. A limit below a shop lot results in no sale. Large component encoding is still server-thread work: byte/slot bounds and cooldowns reduce exposure but are not a hard millisecond deadline.
-
-Instance ID is bound to the ledger at first creation; changing it later fails closed. Give staging an independent world/ledger and distinct ID. Do not run cloned ledgers under the same identity on multiple servers.
-
-## Ledger and operator commands
-
-Local database: `<world>/data/foundrybulkcommerce/ledger.sqlite`, with SQLite WAL/SHM sidecars and `ledger.lock`. Use persistent **local** storage, not a shared network filesystem. A single bounded worker performs all database operations, including FULL durability commits. The Minecraft thread never waits for SQL; it revalidates shop, player, account, identities and exact source snapshots before mutation.
-
-OP permission level **2**, or console, can use these read-only commands:
-
-| Command | Result |
-| --- | --- |
-| `/bulkcommerce status` | Memory-only readiness, breaker, instance and queued work |
-| `/bulkcommerce recent [limit]` | Latest 10, at most 25 |
-| `/bulkcommerce player <uuid> [limit]` | History for exact player UUID |
-| `/bulkcommerce unresolved` | Latest 25 pending/recovery records |
-| `/bulkcommerce inspect <transaction-uuid> [page]` | Summary/outcome; pages 1+ show full intent evidence |
-
-No refund, replay, reconciliation or breaker-reset command exists. Moderator roles without OP level 2 need a separately reviewed permission integration; do not grant OP merely for this addon. Larger investigations use an offline/read-only SQLite client.
-
-**Containment affects the whole server:** startup denies player login until the ledger is ready. An unresolved restart or emergency blocks all new logins. A live ledger/settlement emergency disconnects all online players, keeping uncertain funds unavailable through other mods. Console audit commands remain available when the database can be opened. A read-query failure also trips containment. Disabling/removing the addon is not a recovery procedure.
-
-## Recovery limits and operations
-
-Intent is durable before any item removal or payment. Successful extraction is verified before payment; payment and ordinary rollback are verified. Outcomes distinguish `APPLIED_MEMORY` from durable game saves. An unclean restart flags the previous boot's potentially mutating records, including apparently successful or rolled-back ones. The persistent breaker survives restarts. **No automatic replay or refund occurs.**
-
-The ledger cannot make Minecraft player files, Sophisticated SavedData and Numismatics atomic. Their saves can disagree after a crash. Ordinary clean shutdown is an operational boundary, not proof of power-loss atomicity or physical persistence across every mod. Before/after snapshots are evidence, never unconditional restoration instructions. Follow docs/RECOVERY.md; preserve one consistent server backup.
-
-There is no automatic ledger retention. Monitor disk/WAL size, unresolved records and status; retain unresolved evidence indefinitely. At 48 KiB per transaction, 1,000/day is roughly 1.37 GiB per 30 days before indexes/WAL; actual snapshots may be much larger. Resolved records may be archived offline after backup and review. Protect the database/backups as sensitive inventory and balance records. POSIX directory/file permissions are restricted; Windows needs hosting-account ACLs.
-
-See docs/ARCHITECTURE.md for authority, schema and Mixins; docs/VERIFICATION.md for evidence and remaining gaps; docs/STAGING_CHECKLIST.md for acceptance. The original hybrid proposal is retained, explicitly deferred, in docs/FUTURE_HYBRID_ARCHITECTURE.md.
-
-## Integrated-server diagnostics and retest
-
-Replace the prior candidate with **only** `foundrybulkcommerce-0.1.2.jar` and fully restart Minecraft so the common Mixins can apply. Use a disposable world with cheats enabled (or Open to LAN with cheats), then run **`/bulkcommerce status`**. The bare root has no executor; all subcommands require permission level 2. The normal Sell All button does not require that moderator permission.
-
-Expected log stages, under `[BulkCommerce]`:
-
-1. `0.1.2 initialised on physical CLIENT` in Prism (`DEDICATED_SERVER` on a server process).
-2. `Registered /bulkcommerce ... (permission level 2; read-only)` when server commands are built.
-3. `Starting logical server type=IntegratedServer` (or DedicatedServer).
-4. Four `Compatibility SHA-256 verified` lines when Sophisticated is installed.
-5. `SQLite ledger healthy and ready ... admission=OPEN`, or an explicit recovery/error diagnostic.
-
-Set `debugTransactions = true` in the world's serverconfig TOML and restart the world to see request receipt, planning counts, durable intent, revalidation and durable outcome phases. It defaults false and does not print inventory snapshots. On a multiplayer client without a local world, initialization registers handlers but opens no ledger and performs no transactions locally.
-
-For a controlled first test, configure the server shop to BUY_FROM_PLAYER, stone, **64 items for 3 Spurs**. Carry one vanilla shulker containing exactly 64 stone plus a nonmatching item; keep loose stone out of the inventory. Confirm Sell All, verify 64 stone removed, the other item preserved and exactly 3 Spurs added. Inspect the reference using `/bulkcommerce recent` and `/bulkcommerce inspect <uuid>`. Then save/reload and check persistence. The circuit breaker and all recovery restrictions remain active in single-player too; the owner has no bypass.
-
-Historical v0.1.1 integrated acceptance is now confirmed by the architect. v0.1.2 headless runtime tests pass on 21.1.265; the new candidate still needs full-pack 21.1.256 and dedicated staging acceptance. See docs/SHULKER_COMPATIBILITY.md for current evidence and the unresolved original rejection diagnosis.
-
-## v0.1.2 compatibility and staging status
-
-All six registered Sophisticated shulker tiers are covered: base, copper, iron, gold, diamond and Netherite. See **docs/SHULKER_COMPATIBILITY.md** for the complete capacity/modifier matrix and tests. **docs/CONFIGURATION.md** distinguishes bundle size, container/stack capacity, scanning/serialization budgets and transaction quantity. BC-002's working multi-bundle calculation and Treasury's 2,304 maximum configured bundle are unchanged.
-
-The unmodified v0.1.1 adapter also accepted a valid full Netherite box in the new baseline test, so the original live rejection's exact cause is **not established** by the old generic log. v0.1.2 adds exact debug rejection categories and replaces fixed layout/upgrade-ID assumptions with inspected APIs; it does not claim a reproduced material-tier defect.
-
-The runtime suite covers all six tiers with all ten passive modifiers, representative combinations, rollback, aliases, a 300-slot modern saved capacity, every requested 1–4 Netherite transaction, repeated partial selling, mixed loose/vanilla/all-tier storage, checked overflow and durable references. See docs/PERFORMANCE.md for reproducible local warm-JVM measurements, and docs/STAGING_CHECKLIST.md for remaining real-server acceptance. Production compatibility without the addon on clients is preserved by design (no new networking/registries); the actual absent-addon handshake remains a staging gate.
+[Verification and limitations](docs/VERIFICATION.md) · [performance](docs/PERFORMANCE.md) · [integrated acceptance](docs/INTEGRATED_ACCEPTANCE.md) · [dedicated staging](docs/STAGING_CHECKLIST.md). v0.1.2's accepted baseline is preserved by tag `baseline/v0.1.2`. Dedicated full-pack, client handshake, host load and crash-boundary testing remain outstanding.

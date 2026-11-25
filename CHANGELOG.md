@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.0 — 25 November 2026
+
+- Optional Sophisticated Backpacks 3.26.9.2195 integration: all six registered tiers and nine passive stack modifiers, including Omega, through the existing canonical storage API.
+- Restrict vanilla shulker, Sophisticated shulker and backpack extraction to hotbar slots 0–8. Preserve ordinary loose-item inventory behaviour. Revalidate original eligible position/object before mutation.
+- Separate repository-scoped storage identities from extraction eligibility; inspect wider vanilla inventory/cursor and supported Curios/Accessories active/cosmetic equipment without decoding protected contents.
+- Preserve complete canonical settings/upgrades/metadata, exact extraction verification, compensation, checked arithmetic, transaction limits, ledger and persistent recovery containment. No schema migration or new Mixin/network interface.
+- Pin optional integration references by SHA-256; preserve accepted v0.1.2 under baseline/v0.1.2.
+- Add actual runtime backpack/tier/modifier, equipment-alias, mixed async transaction and large-count performance regressions; isolate optional test API signatures from GameTest discovery.
+- Document mandatory eligibility change, compatibility matrix, limits, test evidence and integrated/dedicated acceptance gates. No production deployment; no automatic crash reconciliation.
+
 ## 0.1.2 release candidate — 25 November 2026
 
 - Preserve working v0.1.1 at tag baseline/v0.1.1. Baseline runtime reproduction accepts all six shulker tiers, including Netherite; the historical generic rejection cannot establish its exact cause.

@@ -1,5 +1,7 @@
 # v0.1.2 shulker compatibility and BC-001 investigation
 
+**Historical v0.1.2 report. For current hotbar eligibility and Backpacks support, use V0_2_0_COMPATIBILITY.md.** The architect has since confirmed successful v0.1.2 integrated acceptance; the pending statements below describe delivery-time status.
+
 Recorded **25 November 2026**. Authoritative dependencies: Storage 1.6.2.2159 and Core 1.5.7.2381, exact existing SHA-256 pins. Baseline `f3a5560` is preserved by Git tag `baseline/v0.1.1`.
 
 ## What was established before production changes

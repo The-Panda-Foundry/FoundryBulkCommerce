@@ -1,40 +1,30 @@
-# v0.1.2 dedicated-server staging acceptance
+# v0.2.0 dedicated-server staging acceptance
 
-Prepared **25 November 2026**. Use a disposable consistent copy and keep console access. No production deployment. Automated results and the architect's v0.1.1 integrated tests are documented separately; all dedicated boxes below remain acceptance work.
+Prepared **25 November 2026**. No production deployment is authorized or performed. Full-pack Linux dedicated staging, absent-addon real-client connection, host profiling and crash validation remain outstanding. Automated headless tests are not substitutes for these checks.
 
-## Preparation and connection
+## Preparation and client compatibility
 
-- [ ] Back up world/player data, Numismatics, Sophisticated canonical storage and ledger consistently. Retain v0.1.1/tag baseline/v0.1.1 for comparison. Install only the v0.1.2 addon JAR; leave original four dependencies unchanged.
-- [ ] Use Java 21, Minecraft 1.21.1 and staging NeoForge 21.1.256 with Create dependencies/full modpack. Confirm initialization, exact dependency hashes, Linux SQLite native loading and healthy ledger diagnostics. Full automated runtime here used 21.1.265; exact staging loader still needs this check.
-- [ ] Connect an ordinary full-pack client **without Bulk Commerce installed**. Open the unchanged Treasury interface, execute Sell All and inspect outcome. Also retest integrated hosting with the candidate installed locally.
-- [ ] Give the staging world a distinct instance/ledger identity before first use; do not casually clone/reset a production journal. Verify level-two/console audit commands and denial to unprivileged players.
+- [ ] Back up world/player files, both Sophisticated SavedData repositories, Numismatics and ledger consistently. Retain v0.1.2 and Git tag baseline/v0.1.2. Use a separate staging world/database/serverInstanceId, persistent local disk and console access.
+- [ ] Use Java 21, Minecraft 1.21.1 and NeoForge 21.1.256/full modpack. Install only foundrybulkcommerce-0.2.0.jar on the server alongside the unchanged exact references. Check Linux native SQLite loading, startup hashes, commands and healthy admission. Development runtime here was 21.1.265; exact 21.1.256 must be verified.
+- [ ] Connect a normal modpack client WITHOUT Bulk Commerce. No missing-registry/channel/config negotiation should occur. Use the existing Treasury Sell All UI and confirm the server handles it. Also connect with the addon on a client if desired; no client data is trusted for eligibility.
+- [ ] Check ordinary player access to permitted shops, denial for prohibited shops, and OP-level-two/console read-only commands. Verify instance ID and recent/player/inspect/unresolved output.
 
-## Transaction acceptance
+## Economic and eligibility checks
 
-- [ ] Use a BUY_FROM_PLAYER shop at 2,304 wheat / 1 Spur. For these test cases set bulkTransactionLimit=65536, keeping maxScannedSlots=4096 and maxSnapshotBytes=1048576. Restore approved operational values afterward.
+- [ ] Execute the full INTEGRATED_ACCEPTANCE.md matrix on the dedicated server: all nine hotbar slots, six Storage tiers, six Backpacks tiers, vanilla colours, supported modifiers including Omega, same/mixed tiers, unrelated metadata and nested-item preservation.
+- [ ] Place identical matching resources inside hotbar, main inventory, offhand and equipped containers. Sell All removes only hotbar contents plus ordinary loose stock. Main/offhand/armour/equipped/cosmetic container contents remain byte-for-byte unchanged.
+- [ ] Exercise same-repository UUID aliases between hotbar and every protected location (Curios/Accessories active and cosmetic, cursor). Test independent equal UUID values across the two repositories. Do not weaken duplicate rejection.
+- [ ] At 2,304 wheat / 1 Spur verify the 8,448-wheat Netherite example outcomes (1–4 shulkers: 3/7/11/14 Spurs and 1,536/768/0/1,536 wheat remaining) in one request each. Stock above the 230,400 configured ceiling and above signed-int totals must sell only complete lots within that ceiling; repeat and inspect exact remainder/reference.
+- [ ] Verify insufficient stock, bundle larger than limit, exact item/components, checked payment/account overflow, unsupported upgrades/linked/legacy layouts, scan/snapshot refusal and no late payment after rejection. Defaults/work limits must stay enforced.
+- [ ] Move/replace hotbar containers and introduce protected aliases while intent is pending; expect cancellation without extraction/payment. Retest shop price/permissions/account/dimension changes and disconnects. Use staging-only latency/fault controls if required.
+- [ ] Open/reopen wrappers, place/break shulkers, orderly restart, then verify player data, both canonical repositories, bank fields and ledger records remain consistent. Confirm backpacks/settings/upgrades survive independently of the addon cache.
+- [ ] Repeat with Backpacks absent; repeat with optional equipment APIs absent. Test the actual installed equipment bridge/configuration; unknown providers or mirrored bridges are not certified.
 
-| Netherite boxes | Wheat before | Expected Spurs | Wheat after | Passed / references |
-| --- | ---: | ---: | ---: | --- |
-| 1 | 8,448 | 3 | 1,536 | |
-| 2 | 16,896 | 7 | 768 | |
-| 3 | 25,344 | 11 | 0 | |
-| 4 | 33,792 | 14 | 1,536 | |
+## Load and recovery gates
 
-Each row must be one Sell All request and one successful ledger transaction. Verify both bank balance fields, all remaining stock and unique transaction IDs.
+- [ ] Interleave two and several real players' Sell All requests, repeated clicks and other normal modpack activity. One global transaction remains active; busy requests must cause no mutation/payment and must not be automatically replayed.
+- [ ] Measure normal/full-load MSPT, preparation and settlement duration, request latency p95/p99, heap/GC and SQLite FULL-commit latency/disk/WAL growth. Include component-heavy nonmatches, nine eligible containers, protected inventories, saves and Omega stacks. Record measurements before changing limits; local wheat microbenchmarks are not host capacity estimates.
+- [ ] Disposable fault tests: intent/outcome SQL failure, locked/full/corrupt disk, JVM kills before/after intent, extraction, payment and outcome. Confirm persistent breaker/login containment survives restart and no refund/replay occurs. These tests remain unverified at OS/power-loss boundaries.
+- [ ] Perform one conservative offline manual reconciliation from RECOVERY.md with evidence/operator/reason. Ensure ordinary restart cannot erase unresolved flags. Do not bypass containment by deleting the ledger/removing the addon.
 
-- [ ] Test base/copper/iron/gold/diamond/Netherite, empty/partial/full, every available passive upgrade tier and representative allowed combinations. Preserve unrelated items, names/colors/components and installed upgrade bytes. See SHULKER_COMPATIBILITY.md for the complete matrix; do not assume non-stack upgrades are supported.
-- [ ] Combine different tiers, multiple same-tier boxes, vanilla boxes (including offhand) and loose stock. Confirm exact item/component matching and unchanged shop bundle configuration/prices.
-- [ ] With a lower bulkTransactionLimit, sell only the maximum complete bundles, repeat Sell All and verify the remainder remains. When no complete bundle fits, no payment or mutation should occur. Check a configured limit smaller than one bundle and payout/account overflow.
-- [ ] Open/close existing Sophisticated wrappers, place/break boxes, stop/restart and verify canonical contents, vanilla component persistence, bank state and ledger history. Do not count a dirty flag as proof of cross-resource crash atomicity.
-
-## Rejections, contention and recovery
-
-- [ ] Enable debugTransactions temporarily. Reproduce the original Netherite rejection if possible and capture the exact reason/reference, outer item metadata/identity state and legitimate capacity. Baseline testing did not reproduce a tier-specific failure; its historical exact cause remains unknown.
-- [ ] Test intentional UUID aliases: every duplicate carried identity must be rejected. Confirm stale canonical plans cannot pay twice when two players hold aliases. Never disable this protection to make a test pass.
-- [ ] Confirm explicit unsupported-storage/upgrade, invalid-data, scan-limit, snapshot-limit, insufficient-stock and validation categories. Unsafe sources remain excluded; workload failures cause no partial sale. Disable debug logging after diagnosis.
-- [ ] Attempt concurrent requests from two and several real players, repeated clicks, stale source/price/dimension/account changes while intent is pending, and disconnects. Verify one active transaction, no late stale mutation, duplicate payment or unexpected inventory change.
-- [ ] Profile full-box/component-heavy work during normal world activity and saves. Record MSPT, response latency, heap/GC behaviour, free disk/WAL size and commit contention before increasing protective limits. Local microbenchmark results are not production measurements.
-- [ ] In a disposable fault test, exercise failed intent/outcome writes, disk full/corrupt/locked ledger and kills at removal/payment/outcome boundaries. Verify persistent breaker/login containment survives restart and no automatic refund/replay occurs.
-- [ ] Complete one offline manual reconciliation using RECOVERY.md; preserve evidence and actor/reason. Normal orderly restart must not erase unresolved flags. Never bypass a breaker by deleting the journal or removing the addon.
-
-Record loader/mod versions, quantity/payment before and after, transaction references, timings and deviations. Accept for production only after architect review of these staging results; no deployment is part of this delivery.
+Record exact versions/hashes, before/after quantities and both bank fields, ledger references, timings and any deviations. Architect acceptance is required before any later production deployment.
