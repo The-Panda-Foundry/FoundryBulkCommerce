@@ -62,11 +62,16 @@ public final class BulkSales {
             boolean vanilla = BulkConfig.VANILLA.get(), sophisticated = BulkConfig.SOPHISTICATED.get();
             List<SaleSource> sources = new ArrayList<>(VanillaSources.collect(player, template, vanilla, budget));
             int skipped = 0;
-            List<SophisticatedSources.Skipped> rejectedSources = List.of();
+            List<StorageScan.Skipped> rejectedSources = List.of();
             if (sophisticated && ModList.get().isLoaded("sophisticatedstorage") && ModList.get().isLoaded("sophisticatedcore")) {
                 var collected = SophisticatedSources.collect(player, template, budget);
                 sources.addAll(collected.sources()); skipped = collected.skipped();
                 rejectedSources = collected.rejections();
+            }
+            if (BulkConfig.BACKPACKS.get() && ModList.get().isLoaded("sophisticatedbackpacks")) {
+                var collected = BackpackSources.collect(player, template, budget);
+                sources.addAll(collected.sources()); skipped += collected.skipped();
+                var combined = new ArrayList<StorageScan.Skipped>(rejectedSources); combined.addAll(collected.rejections()); rejectedSources = List.copyOf(combined);
             }
             for (var rejected : rejectedSources) trace(id, "source skipped slot=" + rejected.slot() + " item=" + rejected.item() + " reason=" + rejected.reason());
             trace(id, "work slots=" + budget.slots() + " scannedNbtBytes=" + budget.bytes());
@@ -101,7 +106,7 @@ public final class BulkSales {
             if (json.getBytes(StandardCharsets.UTF_8).length > BulkConfig.SNAPSHOT_LIMIT.get()) throw new SaleRejection(SaleRejection.Reason.SNAPSHOT_LIMIT, "Intent snapshot byte limit exceeded");
             LocalLedger ledger = LedgerRuntime.ledger();
             Plan plan = new Plan(id, player, server, ledger, shop, player.level().dimension().location().toString(), pos,
-                template, lotSize, price, quantity, total, List.copyOf(edits), wallet, now, skipped, vanilla, sophisticated);
+                template, lotSize, price, quantity, total, List.copyOf(edits), wallet, now, skipped, vanilla, sophisticated, BulkConfig.BACKPACKS.get());
             var record = new LocalLedger.Intent(id, player.getUUID(), player.getGameProfile().getName(), System.currentTimeMillis(), quantity, total, json);
             feedback(player, "Preparing bulk sale. Reference: " + id, true);
             trace(id, "intent submitted items=" + quantity + " spurs=" + total + " sources=" + edits.size());
@@ -143,7 +148,7 @@ public final class BulkSales {
                 && plan.shop.price() == plan.price && plan.shop.lotSize() == plan.lotSize
                 && ItemStack.matches(plan.shop.template(), plan.template)
                 && plan.quantity <= BulkConfig.LIMIT.get() && plan.wallet.isBefore();
-            valid = valid && plan.vanilla == BulkConfig.VANILLA.get() && plan.sophisticated == BulkConfig.SOPHISTICATED.get();
+            valid = valid && plan.vanilla == BulkConfig.VANILLA.get() && plan.sophisticated == BulkConfig.SOPHISTICATED.get() && plan.backpacks == BulkConfig.BACKPACKS.get();
             if (valid) for (var edit : plan.edits) if (!edit.isBefore()) { valid = false; break; }
             if (!valid) { finish(plan, "CANCELLED", "Game state changed or request expired before mutation", false); return; }
         } catch (RuntimeException stale) {
@@ -220,7 +225,7 @@ public final class BulkSales {
     }
     private record Plan(UUID id, ServerPlayer player, MinecraftServer server, LocalLedger ledger, ServerShopBlockEntity shop,
         String dimension, BlockPos pos, ItemStack template, int lotSize, int price, int quantity, int payment,
-        List<Transaction.Edit> edits, AccountWallet wallet, long started, int skipped, boolean vanilla, boolean sophisticated) {}
+        List<Transaction.Edit> edits, AccountWallet wallet, long started, int skipped, boolean vanilla, boolean sophisticated, boolean backpacks) {}
 
     private static final class AccountWallet implements Transaction.Wallet {
         private final ServerPlayer player;

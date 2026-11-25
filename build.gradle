@@ -2,7 +2,7 @@ plugins {
     id 'java-library'
     id 'net.neoforged.moddev' version '2.0.148'
 }
-version = '0.1.2'
+version = '0.2.0'
 group = 'com.pandafoundry'
 base { archivesName = 'foundrybulkcommerce' }
 java {
@@ -56,6 +56,17 @@ dependencies {
     compileOnly fileTree(dir: dependencyDirectory.get(), include: ['*.jar'])
     testImplementation fileTree(dir: dependencyDirectory.get(), include: ['*.jar'])
     runtimeOnly fileTree(dir: dependencyDirectory.get(), include: ['*.jar'])
+    def backpackJar = providers.gradleProperty('backpacksJar').orElse('dependencies/sophisticatedbackpacks-1.21.1-3.26.9.2195.jar')
+    def curiosJar = providers.gradleProperty('curiosJar').orElse('dependencies/curios-neoforge-9.5.1+1.21.1.jar')
+    def accessoriesJar=providers.gradleProperty('accessoriesJar').orElse('dependencies/accessories-neoforge-1.1.0-beta.53+1.21.1.jar')
+    compileOnly files(backpackJar.get(),curiosJar.get(),accessoriesJar.get())
+    testImplementation files(backpackJar.get(),curiosJar.get(),accessoriesJar.get())
+    if (providers.gradleProperty('withAccessories').isPresent()) {
+        runtimeOnly files(accessoriesJar.get())
+        runtimeOnly files(providers.gradleProperty('owoJar').get())
+    }
+    if (!providers.gradleProperty('withoutBackpacks').isPresent()) runtimeOnly files(backpackJar.get())
+    if (providers.gradleProperty('withCurios').isPresent()) runtimeOnly files(curiosJar.get())
     if (providers.gradleProperty('createJar').isPresent()) {
         gameTestImplementation files(providers.gradleProperty('createJar').get())
     }
@@ -129,3 +140,21 @@ tasks.named('check') { dependsOn 'ledgerTest' }
 
 // The suites are executable Java harnesses registered above, not JUnit classes.
 tasks.named('test') { failOnNoDiscoveredTests = false }
+
+// Compile optional adapters only against the exact inspected integration archives.
+tasks.register('verifyIntegrationReferences') {
+    def refs = [
+        [providers.gradleProperty('backpacksJar').orElse('dependencies/sophisticatedbackpacks-1.21.1-3.26.9.2195.jar').get(),'de4a51eb3757ee273b56a41620d6598cd3af8578a5a02c4b5a784e42ab4bee2b'],
+        [providers.gradleProperty('curiosJar').orElse('dependencies/curios-neoforge-9.5.1+1.21.1.jar').get(),'a45df2125c26219974aba7507ffc9afe7b83acc941a386af3faacb1cc0056fde'],
+        [providers.gradleProperty('accessoriesJar').orElse('dependencies/accessories-neoforge-1.1.0-beta.53+1.21.1.jar').get(),'10017a3da78ea63e9ece27a1ca32f8cf490362f348778cf8cb759e7282f3beb0']
+    ]
+    inputs.files(refs.collect { file(it[0]) })
+    doLast {
+        refs.each { reference ->
+            def digest=java.security.MessageDigest.getInstance('SHA-256')
+            file(reference[0]).withInputStream { stream -> byte[] buffer=new byte[65536]; int count; while((count=stream.read(buffer))!=-1) digest.update(buffer,0,count) }
+            if(digest.digest().encodeHex().toString()!=reference[1])throw new GradleException('Unverified integration reference: '+file(reference[0]).name)
+        }
+    }
+}
+tasks.named('compileJava') { dependsOn 'verifyIntegrationReferences' }

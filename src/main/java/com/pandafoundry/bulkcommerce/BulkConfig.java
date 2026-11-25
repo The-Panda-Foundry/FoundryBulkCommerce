@@ -7,6 +7,7 @@ public final class BulkConfig {
     public static final ModConfigSpec.BooleanValue ENABLED;
     public static final ModConfigSpec.BooleanValue VANILLA;
     public static final ModConfigSpec.BooleanValue SOPHISTICATED;
+    public static final ModConfigSpec.BooleanValue BACKPACKS;
     public static final ModConfigSpec.IntValue LIMIT;
     public static final ModConfigSpec.ConfigValue<String> INSTANCE;
     public static final ModConfigSpec.IntValue REQUEST_INTERVAL;
@@ -18,8 +19,9 @@ public final class BulkConfig {
         ENABLED = builder.comment("Enable bulk Sell All. False refuses Sell All rather than bypassing the ledger.").define("enabled", true);
         DEBUG_TRANSACTIONS = builder.comment("Log transaction phases at INFO for diagnosis. Includes IDs, quantities and outcome categories; never full inventory snapshots.")
                 .define("debugTransactions", false);
-        VANILLA = builder.comment("Include carried vanilla shulker boxes.").define("vanillaShulkers", true);
-        SOPHISTICATED = builder.comment("Include supported Sophisticated Storage shulkers if installed.").define("sophisticatedShulkers", true);
+        VANILLA = builder.comment("Include vanilla shulker boxes in hotbar slots 0-8 only.").define("vanillaShulkers", true);
+        SOPHISTICATED = builder.comment("Include supported Sophisticated Storage shulkers in hotbar slots 0-8 only, if installed.").define("sophisticatedShulkers", true);
+        BACKPACKS = builder.comment("Include supported backpacks in hotbar slots 0-8 only, if installed.").define("sophisticatedBackpacks", true);
         LIMIT = builder.comment("Maximum individual items per Sell All request, including loose items. Complete lots only.",
                 "Hard ceiling bounds synchronous work; 2304 preserves Treasury's original default quantity limit.")
                 .defineInRange("bulkTransactionLimit", 2304, 1, 1048576);

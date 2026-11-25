@@ -38,7 +38,7 @@ public final class VanillaSources {
                         return new StackEdit(inventory, index, before, remainder(before, amount), registries);
                     }
                 });
-            } else if (shulkers && stack.getCount() == 1
+            } else if (slot < 9 && shulkers && stack.getCount() == 1
                     && stack.getItem() instanceof BlockItem block && block.getBlock() instanceof ShulkerBoxBlock
                     && net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem()).getNamespace().equals("minecraft")
                     && !stack.has(DataComponents.BLOCK_ENTITY_DATA)) {

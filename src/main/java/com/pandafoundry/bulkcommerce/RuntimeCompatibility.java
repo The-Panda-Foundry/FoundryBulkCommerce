@@ -21,6 +21,12 @@ public final class RuntimeCompatibility {
             expected.put("sophisticatedstorage", "bd6cfe04f5062e1ac860f0e8e858185f037b3a20ef3ee387c8f895839781ac69");
             expected.put("sophisticatedcore", "33ff373cd62e2bef84ca5dd18ffea1c7508842a3156d021f1a0101063f69fb39");
         }
+        if (ModList.get().isLoaded("sophisticatedbackpacks")) {
+            expected.put("sophisticatedbackpacks", "de4a51eb3757ee273b56a41620d6598cd3af8578a5a02c4b5a784e42ab4bee2b");
+            expected.put("sophisticatedcore", "33ff373cd62e2bef84ca5dd18ffea1c7508842a3156d021f1a0101063f69fb39");
+        }
+        if (ModList.get().isLoaded("curios")) expected.put("curios", "a45df2125c26219974aba7507ffc9afe7b83acc941a386af3faacb1cc0056fde");
+        if (ModList.get().isLoaded("accessories")) expected.put("accessories", "10017a3da78ea63e9ece27a1ca32f8cf490362f348778cf8cb759e7282f3beb0");
         Map<Path, String> paths = new LinkedHashMap<>();
         expected.forEach((id, hash) -> {
             var file = ModList.get().getModFileById(id);
