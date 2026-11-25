@@ -75,3 +75,8 @@ Added full registry-tier/passive modifier matrix, actual equipped/cosmetic alias
 Measured native Netherite Omega backpack capture/partial planning on this Mac (40 warmed samples each), with bounded inspections and data sizes; details/limits in PERFORMANCE.md. No claim of full-pack/Linux/concurrent network MSPT or crash atomicity. Updated configuration, compatibility, architecture, recovery boundaries and separate integrated/dedicated acceptance checklists. Future hybrid proposal retained. No production deployment.
 
 Final build-input check explicitly limits development runtime fileTree inputs to the original four archives; optional integration flags now remain effective even when all compile references share dependencies/. Absent-integration build/runtime was rerun successfully after that Gradle change. Archive validation confirms Java21, 45 addon classes, no test/foreign mod classes and unchanged nested SQLite.
+
+
+## 25 November 2026 — architect's integrated acceptance checkpoint
+
+Recorded successful manually tested standard backpack tiers, multiple mixed containers, 300,000-wheat Omega Netherite shulker, hotbar eligibility, protected main inventory/Curios equipment and partial extraction. Mixed test left 1,120 wheat in an eligible backpack; protected containers untouched. Preserved unchanged implementation d25249a under annotated acceptance/v0.2.0-integrated-functional-2026-11-25. Verified production JAR hash still matches release receipt. Documentation-only update records exact evidence boundaries and ordered final validation gates. No implementation/configuration changes, recompilation, new features, refactoring or deployment. Upgraded backpacks, persistence, concurrency, crash recovery and dedicated compatibility remain pending.

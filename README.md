@@ -1,6 +1,6 @@
 # Foundry: Bulk Commerce
 
-**v0.2.0 release candidate — 25 November 2026.** Minecraft 1.21.1, Java 21, NeoForge; integrated and dedicated logical servers. Extends Treasury's existing BUY_FROM_PLAYER server-shop **Sell All**. No production deployment has occurred.
+**v0.2.0 release candidate — 25 November 2026.** Architect-reported integrated functional acceptance has passed for the manually tested scenarios; upgraded backpacks, persistence, concurrency, crash recovery and dedicated compatibility remain pending. See [live acceptance and final validation plan](docs/LIVE_ACCEPTANCE_2026-11-25.md). Minecraft 1.21.1, Java 21, NeoForge; integrated and dedicated logical servers. Extends Treasury's existing BUY_FROM_PLAYER server-shop **Sell All**. No production deployment has occurred.
 
 Put eligible containers in **any of hotbar slots 0–8**, open the existing Treasury interface and click Sell All. The selected slot does not matter. Containers in the remaining inventory, offhand, armour, Curios and Accessories are protected. Loose matching items retain Treasury's ordinary main-inventory behaviour (slots 0–35). Nested containers are never traversed or sold as commodities.
 
@@ -23,7 +23,7 @@ Storage and Backpacks use independent SavedData repositories. Identities are **r
 
 ## Installation and configuration
 
-Dedicated server: replace the old addon with **only** `foundrybulkcommerce-0.2.0.jar` and restart. Multiplayer clients need their normal modpack, **without needing Bulk Commerce**. Single-player hosts install the addon locally; its logical server handles transactions. No new screens, packets or client registry entries are introduced. Real absent-addon client handshake and full-pack v0.2.0 gameplay remain staging gates.
+Dedicated server: replace the old addon with **only** `foundrybulkcommerce-0.2.0.jar` and restart. Multiplayer clients need their normal modpack, **without needing Bulk Commerce**. Single-player hosts install the addon locally; its logical server handles transactions. No new screens, packets or client registry entries are introduced. Real absent-addon client handshake remains a staging gate; integrated gameplay is confirmed only for the reported manual scenarios.
 
 Required economy references: Treasury 1.0.2, Create Numismatics 1.1.0 and their usual Create dependencies. Optional integrations: exact Storage/Core, Backpacks, Curios 9.5.1 and Accessories 1.1.0-beta.53 reference builds. The addon does not supply those mods. SQLite JDBC 3.51.3.0 is bundled via NeoForge Jar-in-Jar; see [notices](THIRD_PARTY_NOTICES.md).
 
@@ -80,4 +80,4 @@ Override paths with `-PdependencyDir=...` (original four), `-PbackpacksJar=...`,
 
 `build` invokes five executable JavaExec suites through `check` (2,406 checks), rather than JUnit tests. GameTests additionally load actual mods/Mixins, bank, canonical repositories and native SQLite. Read actual required-test success lines, not just Gradle's exit. Output: `build/libs/foundrybulkcommerce-0.2.0.jar` and sources JAR. Test-only fixtures are never packaged in the production addon. Development run worlds are disposable; never use production data.
 
-[Verification and limitations](docs/VERIFICATION.md) · [performance](docs/PERFORMANCE.md) · [integrated acceptance](docs/INTEGRATED_ACCEPTANCE.md) · [dedicated staging](docs/STAGING_CHECKLIST.md). v0.1.2's accepted baseline is preserved by tag `baseline/v0.1.2`. Dedicated full-pack, client handshake, host load and crash-boundary testing remain outstanding.
+[Verification and limitations](docs/VERIFICATION.md) · [performance](docs/PERFORMANCE.md) · [integrated acceptance](docs/INTEGRATED_ACCEPTANCE.md) · [dedicated staging](docs/STAGING_CHECKLIST.md). v0.1.2's accepted baseline is preserved by tag `baseline/v0.1.2`. Dedicated full-pack, client handshake, upgraded-backpack validation, persistence, concurrency, host load and crash-boundary testing remain outstanding.

@@ -1,6 +1,6 @@
 # v0.2.0 integrated-server acceptance
 
-Prepared **25 November 2026**. All boxes below require live acceptance; automated results are in VERIFICATION.md. Use a disposable copy and the full Panda Foundry modpack, Java 21 / NeoForge 21.1.256. Do not test failure boundaries in a valuable world.
+Prepared **25 November 2026**. The architect has reported successful standard-tier/mixed/hotbar/protected/partial-sale scenarios in LIVE_ACCEPTANCE_2026-11-25.md. Boxes below are the full regression protocol; they remain unchecked because broader rows include unverified subcases. Automated results are in VERIFICATION.md. Use a disposable copy and the full Panda Foundry modpack, Java 21 / NeoForge 21.1.256. Do not test failure boundaries in a valuable world.
 
 - [ ] Preserve the accepted v0.1.2 JAR and consistent world/ledger backup. Replace only the addon with v0.2.0. Confirm one addon JAR and the exact reference mods; do not modify dependency JARs.
 - [ ] Open a staging copy with a distinct serverInstanceId/ledger identity. Confirm physical CLIENT initialization, logical IntegratedServer, dependency hashes, command registration and healthy SQLite admission. With cheats/OP level 2, run /bulkcommerce status.

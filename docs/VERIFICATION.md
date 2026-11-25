@@ -1,5 +1,9 @@
 # Verification and review disposition
 
+## Architect-reported live acceptance update — 25 November 2026
+
+Standard backpack tiers, mixed backpacks/shulkers, a 300,000-wheat Omega Netherite shulker, hotbar-only extraction, protected main-inventory and Curios storage, and partial remainder retention passed manual integrated testing. The mixed sale left 1,120 wheat in one eligible backpack and protected containers untouched. See LIVE_ACCEPTANCE_2026-11-25.md for precise evidence boundaries and the final validation plan. Working implementation d25249a is preserved by annotated tag acceptance/v0.2.0-integrated-functional-2026-11-25. Upgraded backpack testing, persistence, real-player concurrency, crash/manual recovery and dedicated/client compatibility remain unverified. No production code or JAR changed for this record; automated results below are the existing evidence.
+
 ## Current v0.2.0 release candidate — 25 November 2026
 
 - Accepted v0.1.2 baseline preserved before edits: `25505d80e5d3621eb96d02bf3448d8fbd908f35a`, tag `baseline/v0.1.2`. Original dependency archives remain unmodified and excluded from source/distribution.
