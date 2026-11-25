@@ -50,3 +50,15 @@
 - Added a test-only physical CLIENT quick-play harness using a disposable copy of the prior test world. Attempted actual client launch; macOS graphical-session services failed before mod loading. Interrupted the blocked attempt. No integrated runtime pass is claimed.
 - Tried an offline 21.1.256 build: required NeoForge artifacts are not cached, so that version could not be tested here. Final build/runtime use 21.1.265; a Gradle version override is supplied for exact-version retesting with available dependencies.
 - Original references unchanged, no source changes in the external project, no production deployment. Full Prism integrated acceptance and dedicated client-without-addon handshake remain explicit acceptance gates.
+
+## v0.1.2 BC-001 and acceptance continuation — 25 November 2026
+
+- Preserved v0.1.1 f3a5560 as baseline/v0.1.1 before production edits. Created a separate focused development branch.
+- Read the acceptance log and inspected the exact supplied registry/handler implementations. Baseline actual-runtime reproduction accepted all six full tiers, including Netherite 132 slots. The original live rejection is not reproducible as a tier-specific defect; old debug-off logs cannot identify the exact guard. This limitation is explicit.
+- Inspected local acceptance SavedData read-only: a canonical 132-slot/8,448-wheat record exists, but cannot prove the historical outer inventory/alias/request state. No user world or dependency changes.
+- Implemented API capacity validation, passive modifier-class discovery/validation, single-pass decoding with reusable matching plan, and precise rejection categories. Preserved all transaction/identity/access/ledger safeguards and default workload values.
+- Runtime discovery found six shulkers, seven stack upgrades and three passive downgrades. Matrix covers each modifier/tier pair and representative mixed/repeated combinations, full/empty/mixed contents, upgrades/metadata, aliases, exact rollback and an API-promoted 300-slot capacity.
+- Added real Treasury/SQLite Netherite tests for 1/2/3/4 boxes (3/7/11/14 Spurs), configured-limit remainders, repeated requests, concurrent admission refusal, all-tier+vanilla+loose mixed transaction, insufficient stock and payout/account overflow. BC-002 calculation remains unchanged.
+- Added local warm-JVM capture/plan/evidence and thread-allocation benchmark against the exact v0.1.1 addon. No timing-dependent pass threshold; report sample sizes/environment and outstanding full-pack host profiling.
+- First expanded matrix exposed three legitimate passive downgrade items omitted by the prior ID list; the API-class rule includes them. Corrected test fixtures to respect their smaller per-slot capacities. Test timeouts increased to allow native SQLite startup under fast headless GameTest ticks; no production waits/tick processing added.
+- Updated complete compatibility/configuration matrix, diagnostics, performance report and dedicated staging checklist. Exact live original rejection, .2 full-pack integrated behaviour, Linux native loading/absent-addon handshake and real crash/host load acceptance remain pending. No production deployment.

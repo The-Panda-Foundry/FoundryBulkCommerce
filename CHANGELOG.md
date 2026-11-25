@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.2 release candidate — 25 November 2026
+
+- Preserve working v0.1.1 at tag baseline/v0.1.1. Baseline runtime reproduction accepts all six shulker tiers, including Netherite; the historical generic rejection cannot establish its exact cause.
+- Validate registered Sophisticated shulkers/capacities with non-mutating dependency APIs and modern saved components. Support legitimate larger saved capacities within existing workload limits.
+- Replace individual upgrade IDs with the exact inspected passive StackUpgradeItem class/namespace/finite-multiplier checks, covering all seven upgrades and three downgrades. Other processing hooks remain excluded.
+- Decode canonical entries once and reuse the immutable exact-match plan for removal; preserve complete before/after verification, rollback and metadata.
+- Add typed, bounded rejection categories and debug-only source/work details. No protective default/range is raised.
+- Add installed-registry matrix, Netherite/mixed/repeated/overflow/ledger runtime regressions and reproducible preparation/heap-allocation comparison with v0.1.1.
+- BC-002: no change to the working quantity calculation or Treasury bundle maximum; larger transactions remain configured through bulkTransactionLimit.
+- No ledger migration, new networking, automatic recovery, scope expansion or production deployment.
+
 ## 0.1.1 — 25 November 2026
 
 - Correct physical-side restrictions: common entry point and common-class Mixins now activate for integrated and dedicated servers. Economic execution remains on the logical server thread.

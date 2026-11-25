@@ -1,6 +1,6 @@
 # Foundry: Bulk Commerce
 
-**0.1.1 focused correction — 25 November 2026.** Minecraft 1.21.1, integrated or dedicated NeoForge server, Java 21. Standard Gradle build and a real NeoForge GameTest have passed. Real-player acceptance in the complete server modpack is still required. Nothing has been deployed to production.
+**0.1.2 release candidate — 25 November 2026.** Minecraft 1.21.1, integrated or dedicated NeoForge server, Java 21. Standard Gradle build and a real NeoForge GameTest have passed. The architect confirmed v0.1.1 integrated acceptance on 21.1.256. This v0.1.2 candidate still requires full-pack and dedicated staging acceptance. Nothing has been deployed to production.
 
 Extends **Numismatics Treasury's existing server-shop Sell All** to matching items in carried vanilla and supported Sophisticated Storage shulkers. Treasury retains shop prices, complete lots, access checks and exact item/component matching. Only Sell All is replaced; manual sales, purchases, auctions and transfers retain their original implementation.
 
@@ -12,8 +12,8 @@ Carry your items/boxes, open a BUY_FROM_PLAYER server shop and click Sell All. E
 | --- | --- |
 | Loose main inventory/hotbar | Same slots and comparison as Treasury |
 | Vanilla shulkers | Vanilla inventory, including offhand; one box per slot |
-| Sophisticated Storage shulkers | Modern UUID-backed canonical finite storage; at most 256 slots |
-| Stack upgrades | Standard tiers 1, 1+, 2–5 and omega; oversized positive integer counts |
+| Sophisticated Storage shulkers | Modern UUID-backed canonical finite storage; API capacity and configured work limits |
+| Stack upgrades | All seven registered upgrades plus three passive downgrades; mixed/repeated finite modifiers and positive integer counts |
 | Other upgrades/partitions | Excluded, including disabled non-stack upgrades and infinite/creative partitions |
 | Linked storage, backpacks, placed containers | Excluded |
 | Nested containers | Never traversed or sold as commodities |
@@ -39,7 +39,7 @@ export JAVA_HOME=$(/usr/libexec/java_home -v 21)
 ./gradlew --offline -PdependencyDir=/absolute/path/to/dependencies build
 ```
 
-`build` runs reference hashes, compilation and five executable regression suites through `check`. Gradle's JUnit discovery task has no JUnit tests; the named JavaExec suites are the tests. Output: `build/libs/foundrybulkcommerce-0.1.1.jar` and `-sources.jar`. Original dependency JARs are excluded from Git and distribution. SQLite JDBC **3.51.3.0** is bundled through NeoForge Jar-in-Jar; see THIRD_PARTY_NOTICES.md. No MongoDB dependency is added.
+`build` runs reference hashes, compilation and five executable regression suites through `check`. Gradle's JUnit discovery task has no JUnit tests; the named JavaExec suites are the tests. Output: `build/libs/foundrybulkcommerce-0.1.2.jar` and `-sources.jar`. Original dependency JARs are excluded from Git and distribution. SQLite JDBC **3.51.3.0** is bundled through NeoForge Jar-in-Jar; see THIRD_PARTY_NOTICES.md. No MongoDB dependency is added.
 
 Runtime requires Treasury 1.0.2, Numismatics 1.1.0 and Create 6.0.10–below 6.1.0 with its normal dependencies. Sophisticated Storage/Core are optional at runtime, required for source compilation/reference checks. Exact supplied reference bytes are checked at startup before admitting players (including the Sophisticated pair when installed). Unexpected builds fail closed even when their metadata version is identical.
 
@@ -101,13 +101,13 @@ There is no automatic ledger retention. Monitor disk/WAL size, unresolved record
 
 See docs/ARCHITECTURE.md for authority, schema and Mixins; docs/VERIFICATION.md for evidence and remaining gaps; docs/STAGING_CHECKLIST.md for acceptance. The original hybrid proposal is retained, explicitly deferred, in docs/FUTURE_HYBRID_ARCHITECTURE.md.
 
-## v0.1.1 integrated-server retest
+## Integrated-server diagnostics and retest
 
-Replace v0.1.0 with **only** `foundrybulkcommerce-0.1.1.jar` and fully restart Minecraft so the common Mixins can apply. Use a disposable world with cheats enabled (or Open to LAN with cheats), then run **`/bulkcommerce status`**. The bare root has no executor; all subcommands require permission level 2. The normal Sell All button does not require that moderator permission.
+Replace the prior candidate with **only** `foundrybulkcommerce-0.1.2.jar` and fully restart Minecraft so the common Mixins can apply. Use a disposable world with cheats enabled (or Open to LAN with cheats), then run **`/bulkcommerce status`**. The bare root has no executor; all subcommands require permission level 2. The normal Sell All button does not require that moderator permission.
 
 Expected log stages, under `[BulkCommerce]`:
 
-1. `0.1.1 initialised on physical CLIENT` in Prism (`DEDICATED_SERVER` on a server process).
+1. `0.1.2 initialised on physical CLIENT` in Prism (`DEDICATED_SERVER` on a server process).
 2. `Registered /bulkcommerce ... (permission level 2; read-only)` when server commands are built.
 3. `Starting logical server type=IntegratedServer` (or DedicatedServer).
 4. Four `Compatibility SHA-256 verified` lines when Sophisticated is installed.
@@ -117,4 +117,12 @@ Set `debugTransactions = true` in the world's serverconfig TOML and restart the 
 
 For a controlled first test, configure the server shop to BUY_FROM_PLAYER, stone, **64 items for 3 Spurs**. Carry one vanilla shulker containing exactly 64 stone plus a nonmatching item; keep loose stone out of the inventory. Confirm Sell All, verify 64 stone removed, the other item preserved and exactly 3 Spurs added. Inspect the reference using `/bulkcommerce recent` and `/bulkcommerce inspect <uuid>`. Then save/reload and check persistence. The circuit breaker and all recovery restrictions remain active in single-player too; the owner has no bypass.
 
-The correction and dedicated runtime regression pass. An actual physical-client/integrated runtime launch was attempted but blocked before mod loading by this task environment's macOS graphical-session restrictions. NeoForge 21.1.256/full-pack Prism acceptance therefore remains to be rerun by the architect; see the investigation report for the evidence and boundaries.
+Historical v0.1.1 integrated acceptance is now confirmed by the architect. v0.1.2 headless runtime tests pass on 21.1.265; the new candidate still needs full-pack 21.1.256 and dedicated staging acceptance. See docs/SHULKER_COMPATIBILITY.md for current evidence and the unresolved original rejection diagnosis.
+
+## v0.1.2 compatibility and staging status
+
+All six registered Sophisticated shulker tiers are covered: base, copper, iron, gold, diamond and Netherite. See **docs/SHULKER_COMPATIBILITY.md** for the complete capacity/modifier matrix and tests. **docs/CONFIGURATION.md** distinguishes bundle size, container/stack capacity, scanning/serialization budgets and transaction quantity. BC-002's working multi-bundle calculation and Treasury's 2,304 maximum configured bundle are unchanged.
+
+The unmodified v0.1.1 adapter also accepted a valid full Netherite box in the new baseline test, so the original live rejection's exact cause is **not established** by the old generic log. v0.1.2 adds exact debug rejection categories and replaces fixed layout/upgrade-ID assumptions with inspected APIs; it does not claim a reproduced material-tier defect.
+
+The runtime suite covers all six tiers with all ten passive modifiers, representative combinations, rollback, aliases, a 300-slot modern saved capacity, every requested 1–4 Netherite transaction, repeated partial selling, mixed loose/vanilla/all-tier storage, checked overflow and durable references. See docs/PERFORMANCE.md for reproducible local warm-JVM measurements, and docs/STAGING_CHECKLIST.md for remaining real-server acceptance. Production compatibility without the addon on clients is preserved by design (no new networking/registries); the actual absent-addon handshake remains a staging gate.

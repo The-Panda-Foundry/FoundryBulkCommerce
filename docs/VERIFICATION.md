@@ -2,7 +2,24 @@
 
 Date: **25 November 2026**. Based on reviewed source commit `ca0b30f`; final MVP commit is recorded in the delivery receipt/Git history. Nothing deployed to production; original four JARs remain unmodified and excluded from distribution.
 
-## Current v0.1.1 correction — 25 November 2026
+## Current v0.1.2 release candidate — 25 November 2026
+
+- Working baseline f3a5560 preserved by tag baseline/v0.1.1 before edits. Unmodified-baseline real runtime accepted all six shulker tiers including full Netherite. The original debug-off live rejection's exact cause is **not established**; see SHULKER_COMPATIBILITY.md.
+- Standard Java 21 / ModDevGradle build passes with **2,403 executable checks**: transaction 2,327; compatibility 20; native SQLite 27; vanilla 16; canonical schema 13. Production quantity calculation and Treasury's maximum configured bundle are unchanged.
+- **Four required actual NeoForge GameTests pass:** installed adapters/Mixins + async stale cancellation; complete registry matrix (431 explicit matrix assertions); preparation benchmark/scan-byte refusal; Netherite/mixed/repeated/concurrent/overflow/ledger transactions. Tests use actual mods, wrappers, bank, Treasury handler and SQLite, not only schema mocks. See complete tables in SHULKER_COMPATIBILITY.md and PERFORMANCE.md.
+- All requested Netherite outcomes match: 1/2/3/4 boxes pay 3/7/11/14 Spurs with 1,536/768/0/1,536 wheat left. Each is one asynchronous Sell All and one durable ledger outcome. Six mixed Sophisticated tiers plus vanilla/loose stock settle in another single request. Counter/history checks verify unique references and no records/payments from rejected preparations.
+- New production diagnostics use bounded categories/source details behind debugTransactions. Scan/snapshot defaults remain 4,096/1 MiB, including an API-validated per-container scan-capacity ceiling. A dependency-promoted 300-slot saved capacity is exercised; excessive data/work still fails closed.
+- Local timing/allocation comparison to the exact v0.1.1 JAR shows reduced work/allocations for the tested scenarios. It is not an MSPT/load/production result. Test timeouts were increased for fast headless ticking/native startup; no database wait or periodic scan was added to production.
+- Tested runtime remains NeoForge 21.1.265 on this Mac. The architect independently confirmed v0.1.1 integrated gameplay on 21.1.256. v0.1.2 full-pack integrated regression, exact 21.1.256 dedicated Linux staging, absent-addon real-client handshake, disk/kill boundaries and real host load remain acceptance gates. All original crash-atomicity limits remain.
+- Existing normal Gradle cache and temporary local SQLite Maven mirror were reused as described below. Original reference hashes still pass; no original dependency JAR was modified or distributed. No production deployment.
+
+Current artifact: `foundrybulkcommerce-0.1.2.jar`, SHA-256 `92ac4f47740a2e722d3dea0ddd152003d2fa90aef67ce72f435fee884201cbea`; Java class major 65. Archive inspection confirms the four common Mixins, exact unmodified nested SQLite and no original mod/dependency classes, GameTest or acceptance-launcher classes.
+
+Functional source commit: `d3d68b615e61a1de688498334647377bc75a18cc`. The delivery receipt records the final documentation commit. After the last runtime pass, only configuration comments and an isolated schema-test fixture correction changed; the standard build and that schema suite were rerun successfully.
+
+The remaining versioned sections preserve earlier evidence and artifact hashes as history.
+
+## Historical v0.1.1 correction — 25 November 2026
 
 Root cause and implementation: INTEGRATED_SERVER_FIX.md. Standard Gradle build passed, with **2,403 executable checks** (2,327 transaction + 20 structural/physical-side/request-path + 27 native SQLite + 16 vanilla + 13 Sophisticated). Actual NeoForge **physical DEDICATED_SERVER GameTest passed** with common Mixins and mixed async selling/stale cancellation. Diagnostics and opt-in phase logs were observed. Java 21, NeoForge 21.1.265; SQLite supplied via the same temporary local Maven override described below. Production JAR inspection confirms Java 21 class version, v0.1.1 metadata, common four-Mixin list, nested SQLite, and no client-test/GameTest classes.
 
