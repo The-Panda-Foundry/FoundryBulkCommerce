@@ -2,7 +2,7 @@ plugins {
     id 'java-library'
     id 'net.neoforged.moddev' version '2.0.148'
 }
-version = '0.2.1'
+version = '0.2.2'
 group = 'com.pandafoundry'
 base { archivesName = 'foundrybulkcommerce' }
 java {
@@ -47,22 +47,32 @@ neoForge {
 repositories { mavenCentral() }
 
 def dependencyDirectory = providers.gradleProperty('dependencyDir').orElse('dependencies')
+def coreJar=providers.gradleProperty('coreJar').orElse(new File(file(dependencyDirectory.get()),'sophisticatedcore-1.21.1-1.5.43.2504.jar').path)
+def storageJar=providers.gradleProperty('storageJar').orElse(new File(file(dependencyDirectory.get()),'sophisticatedstorage-1.21.1-1.6.22.2244.jar').path)
+def backpackJar=providers.gradleProperty('backpacksJar').orElse(new File(file(dependencyDirectory.get()),'sophisticatedbackpacks-1.21.1-3.26.23.2263.jar').path)
+def cohorts=[
+    ['33ff373cd62e2bef84ca5dd18ffea1c7508842a3156d021f1a0101063f69fb39','bd6cfe04f5062e1ac860f0e8e858185f037b3a20ef3ee387c8f895839781ac69','de4a51eb3757ee273b56a41620d6598cd3af8578a5a02c4b5a784e42ab4bee2b'],
+    ['6273cfa446b338f165a9c799ddd78fcb320fad0b519a70d969165b7518d3bac8','e11e7bbb8c4e4acf8b34bb0133c82d95c4e9c5dd843c46c21c8a482d9e40d80f','8df6a8ebad2aebc71bc54e51eddd47fe931ed8bc338f7d1924e272ac72e38092']
+]
+def referenceDigest={ File reference ->
+    def digest=java.security.MessageDigest.getInstance('SHA-256')
+    reference.withInputStream { stream -> byte[] buffer=new byte[65536];int n;while((n=stream.read(buffer))!=-1)digest.update(buffer,0,n) }
+    digest.digest().encodeHex().toString()
+}
+
 dependencies {
     additionalRuntimeClasspath('org.xerial:sqlite-jdbc:3.51.3.0') { transitive = false }
     jarJar(implementation('org.xerial:sqlite-jdbc:3.51.3.0')) {
         version { strictly '[3.51.3.0]'; prefer '3.51.3.0' }
         transitive = false
     }
-    compileOnly fileTree(dir: dependencyDirectory.get(), include: ['*.jar'])
-    testImplementation fileTree(dir: dependencyDirectory.get(), include: ['*.jar'])
-    // Optional integrations are controlled below, even when all references share dependencies/.
-    runtimeOnly files([
-        'CreateNumismatics-1.1.0+neoforge-mc1.21.1.jar',
-        'numismatics_treasury-1.0.2.jar',
-        'sophisticatedcore-1.21.1-1.5.7.2381.jar',
-        'sophisticatedstorage-1.21.1-1.6.2.2159.jar'
-    ].collect { new File(file(dependencyDirectory.get()), it) })
-    def backpackJar = providers.gradleProperty('backpacksJar').orElse('dependencies/sophisticatedbackpacks-1.21.1-3.26.9.2195.jar')
+    def economy=fileTree(dir:dependencyDirectory.get(),include:['CreateNumismatics-1.1.0+neoforge-mc1.21.1.jar','numismatics_treasury-1.0.2.jar'])
+    compileOnly economy
+    testImplementation economy
+    runtimeOnly economy
+    compileOnly files(coreJar.get(),storageJar.get())
+    testImplementation files(coreJar.get(),storageJar.get())
+    runtimeOnly files(coreJar.get(),storageJar.get())
     def curiosJar = providers.gradleProperty('curiosJar').orElse('dependencies/curios-neoforge-9.5.1+1.21.1.jar')
     def accessoriesJar=providers.gradleProperty('accessoriesJar').orElse('dependencies/accessories-neoforge-1.1.0-beta.53+1.21.1.jar')
     compileOnly files(backpackJar.get(),curiosJar.get(),accessoriesJar.get())
@@ -91,7 +101,7 @@ tasks.register('compatibilityTest', JavaExec) {
     dependsOn testClasses
     classpath = sourceSets.test.runtimeClasspath
     mainClass = 'com.pandafoundry.bulkcommerce.CompatibilityTest'
-    args file(dependencyDirectory.get()).absolutePath
+    args file(dependencyDirectory.get()).absolutePath, file(coreJar.get()).absolutePath, file(storageJar.get()).absolutePath
 }
 tasks.register('vanillaAdapterTest', JavaExec) {
     dependsOn testClasses
@@ -110,25 +120,16 @@ tasks.named('check') { dependsOn 'integrityTest', 'compatibilityTest', 'vanillaA
 
 def referenceHashes = [
     'CreateNumismatics-1.1.0+neoforge-mc1.21.1.jar': 'd33a33b46f923462ae6806a024851afaefa473ced0e95bf405f8ebc13abce767',
-    'numismatics_treasury-1.0.2.jar': 'fde8264ff0e17792b6160e6c41c6ea0b19e5de1343ddddcdf13b5a0bddba46e2',
-    'sophisticatedcore-1.21.1-1.5.7.2381.jar': '33ff373cd62e2bef84ca5dd18ffea1c7508842a3156d021f1a0101063f69fb39',
-    'sophisticatedstorage-1.21.1-1.6.2.2159.jar': 'bd6cfe04f5062e1ac860f0e8e858185f037b3a20ef3ee387c8f895839781ac69'
+    'numismatics_treasury-1.0.2.jar': 'fde8264ff0e17792b6160e6c41c6ea0b19e5de1343ddddcdf13b5a0bddba46e2'
 ]
 tasks.register('verifyCompatibilityReferences') {
-    inputs.files(referenceHashes.keySet().collect { new File(file(dependencyDirectory.get()), it) })
+    inputs.files(referenceHashes.keySet().collect { new File(file(dependencyDirectory.get()),it) }+[file(coreJar.get()),file(storageJar.get())])
     doLast {
-        referenceHashes.each { name, expected ->
-            def reference = new File(file(dependencyDirectory.get()), name)
-            if (!reference.isFile()) throw new GradleException("Missing compatibility reference: ${reference}")
-            def digest = java.security.MessageDigest.getInstance('SHA-256')
-            reference.withInputStream { stream ->
-                byte[] buffer = new byte[65536]
-                int count
-                while ((count = stream.read(buffer)) != -1) digest.update(buffer, 0, count)
-            }
-            if (digest.digest().encodeHex().toString() != expected)
-                throw new GradleException("Compatibility reference differs: ${name}")
+        referenceHashes.each { name,expected ->
+            if(referenceDigest(new File(file(dependencyDirectory.get()),name))!=expected)throw new GradleException('Unverified compatibility reference: '+name)
         }
+        def core=referenceDigest(file(coreJar.get())), storage=referenceDigest(file(storageJar.get()))
+        if(!cohorts.any { it[0]==core&&it[1]==storage })throw new GradleException('Unverified or mixed Core/Storage cohort')
     }
 }
 tasks.named('compileJava') { dependsOn 'verifyCompatibilityReferences' }
@@ -147,20 +148,17 @@ tasks.named('check') { dependsOn 'ledgerTest' }
 // The suites are executable Java harnesses registered above, not JUnit classes.
 tasks.named('test') { failOnNoDiscoveredTests = false }
 
-// Compile optional adapters only against the exact inspected integration archives.
+// All compile inputs must belong to an independently validated complete Sophisticated cohort.
 tasks.register('verifyIntegrationReferences') {
-    def refs = [
-        [providers.gradleProperty('backpacksJar').orElse('dependencies/sophisticatedbackpacks-1.21.1-3.26.9.2195.jar').get(),'de4a51eb3757ee273b56a41620d6598cd3af8578a5a02c4b5a784e42ab4bee2b'],
+    def refs=[
         [providers.gradleProperty('curiosJar').orElse('dependencies/curios-neoforge-9.5.1+1.21.1.jar').get(),'a45df2125c26219974aba7507ffc9afe7b83acc941a386af3faacb1cc0056fde'],
         [providers.gradleProperty('accessoriesJar').orElse('dependencies/accessories-neoforge-1.1.0-beta.53+1.21.1.jar').get(),'10017a3da78ea63e9ece27a1ca32f8cf490362f348778cf8cb759e7282f3beb0']
     ]
-    inputs.files(refs.collect { file(it[0]) })
+    inputs.files(refs.collect { file(it[0]) }+[file(coreJar.get()),file(storageJar.get()),file(backpackJar.get())])
     doLast {
-        refs.each { reference ->
-            def digest=java.security.MessageDigest.getInstance('SHA-256')
-            file(reference[0]).withInputStream { stream -> byte[] buffer=new byte[65536]; int count; while((count=stream.read(buffer))!=-1) digest.update(buffer,0,count) }
-            if(digest.digest().encodeHex().toString()!=reference[1])throw new GradleException('Unverified integration reference: '+file(reference[0]).name)
-        }
+        refs.each { ref -> if(referenceDigest(file(ref[0]))!=ref[1])throw new GradleException('Unverified integration reference: '+file(ref[0]).name) }
+        def actual=[coreJar.get(),storageJar.get(),backpackJar.get()].collect { referenceDigest(file(it)) }
+        if(!cohorts.contains(actual))throw new GradleException('Unverified or mixed Sophisticated compile cohort')
     }
 }
 tasks.named('compileJava') { dependsOn 'verifyIntegrationReferences' }

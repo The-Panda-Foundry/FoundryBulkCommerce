@@ -26,8 +26,8 @@ public final class BulkConfig {
         SOPHISTICATED = builder.comment("Include supported Sophisticated Storage shulkers in hotbar slots 0-8 only, if installed.").define("sophisticatedShulkers", true);
         BACKPACKS = builder.comment("Include supported backpacks in hotbar slots 0-8 only, if installed.").define("sophisticatedBackpacks", true);
         LIMIT = builder.comment("Maximum individual items per Sell All request, including loose items. Complete lots only.",
-                "Hard ceiling bounds synchronous work; 2304 preserves Treasury's original default quantity limit.")
-                .defineInRange("bulkTransactionLimit", 2304, 1, 1048576);
+                "Hard ceiling bounds synchronous work; the default permits complete bulk bundles up to 230400 items.")
+                .defineInRange("bulkTransactionLimit", 230400, 1, 1048576);
         INSTANCE = builder.comment("Optional stable server instance ID. Empty generates and persists a UUID on first start.",
                 "Changing the ID of an existing ledger requires an explicit offline migration.")
                 .define("serverInstanceId", "", value -> value instanceof String text && (text.isEmpty() || text.matches("[A-Za-z0-9_.:-]{1,64}")));

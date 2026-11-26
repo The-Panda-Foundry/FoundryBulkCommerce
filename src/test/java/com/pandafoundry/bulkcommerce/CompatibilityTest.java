@@ -65,11 +65,34 @@ public final class CompatibilityTest {
         check(bank.fields.stream().anyMatch(f -> f.name.equals("balance") && f.desc.equals("I") && (f.access & Opcodes.ACC_PRIVATE) != 0), "standard balance accessor");
         check(bank.fields.stream().anyMatch(f -> f.name.equals("additionalBalance") && f.desc.equals("J") && (f.access & Opcodes.ACC_PRIVATE) != 0), "reserve accessor");
         check(bank.methods.stream().anyMatch(m -> m.name.equals("markDirty") && m.desc.equals("()V")), "account dirty method");
-        var storage = read(deps.resolve("sophisticatedstorage-1.21.1-1.6.2.2159.jar"), "net/p3pp3rf1y/sophisticatedstorage/block/ItemContentsStorage");
+        var storage = read(args.length > 2 ? Path.of(args[2]) : deps.resolve("sophisticatedstorage-1.21.1-1.6.2.2159.jar"), "net/p3pp3rf1y/sophisticatedstorage/block/ItemContentsStorage");
         check(storage.methods.stream().anyMatch(m -> m.name.equals("setStorageContents") && m.desc.equals("(Ljava/util/UUID;Lnet/minecraft/nbt/CompoundTag;)V")), "canonical storage write API");
         check(storage.methods.stream().anyMatch(m -> m.name.equals("getStorageContents") && m.desc.equals("(Ljava/util/UUID;)Ljava/util/Optional;")), "canonical storage read API");
-        var core = read(deps.resolve("sophisticatedcore-1.21.1-1.5.7.2381.jar"), "net/p3pp3rf1y/sophisticatedcore/inventory/StorageWrapperRepository");
+        var core = read(args.length > 1 ? Path.of(args[1]) : deps.resolve("sophisticatedcore-1.21.1-1.5.7.2381.jar"), "net/p3pp3rf1y/sophisticatedcore/inventory/StorageWrapperRepository");
         check(core.methods.stream().anyMatch(m -> m.name.equals("getExistingStorageWrapper")), "cache lookup without allocation");
-        System.out.println("Original JAR compatibility: "+checks+" structural checks passed (no runtime launch)");
+        String[][] cohorts={
+            {"33ff373cd62e2bef84ca5dd18ffea1c7508842a3156d021f1a0101063f69fb39","bd6cfe04f5062e1ac860f0e8e858185f037b3a20ef3ee387c8f895839781ac69","de4a51eb3757ee273b56a41620d6598cd3af8578a5a02c4b5a784e42ab4bee2b"},
+            {"6273cfa446b338f165a9c799ddd78fcb320fad0b519a70d969165b7518d3bac8","e11e7bbb8c4e4acf8b34bb0133c82d95c4e9c5dd843c46c21c8a482d9e40d80f","8df6a8ebad2aebc71bc54e51eddd47fe931ed8bc338f7d1924e272ac72e38092"}
+        };
+        for(int mask=0;mask<8;mask++) {
+            boolean accepted=true;
+            try {RuntimeCompatibility.verifySophisticatedCohort(java.util.Map.of("sophisticatedcore",cohorts[mask&1][0],"sophisticatedstorage",cohorts[(mask>>1)&1][1],"sophisticatedbackpacks",cohorts[(mask>>2)&1][2]));}
+            catch(IllegalStateException expected){accepted=false;}
+            check(accepted==(mask==0||mask==7),"only complete verified old/new cohorts accepted, no mixed sets");
+        }
+        for(var cohort:cohorts) {
+            RuntimeCompatibility.verifySophisticatedCohort(java.util.Map.of("sophisticatedcore",cohort[0],"sophisticatedstorage",cohort[1]));
+            check(true,"Backpacks absent retains strict matching cohort");
+            RuntimeCompatibility.verifySophisticatedCohort(java.util.Map.of("sophisticatedcore",cohort[0],"sophisticatedbackpacks",cohort[2]));
+            check(true,"Storage absent retains strict matching cohort");
+        }
+        for(String key:List.of("sophisticatedcore","sophisticatedstorage","sophisticatedbackpacks")) {
+            boolean refused=false;try{RuntimeCompatibility.verifySophisticatedCohort(java.util.Map.of(key,"same-version-but-different-bytes"));}catch(IllegalStateException expected){refused=true;}
+            check(refused,"unknown same-version hash refused for "+key);
+        }
+        RuntimeCompatibility.verifySophisticatedCohort(java.util.Map.of());check(true,"vanilla/economy-only server has no Sophisticated cohort to verify");
+        check(BulkConfig.LIMIT.getDefault()==230400,"explicitly requested fresh-config item limit default");
+        check(!BulkConfig.DEBUG_TRANSACTIONS.getDefault()&&!BulkConfig.SHOW_TRANSACTION_MESSAGES.getDefault(),"diagnostic and routine chat defaults remain false");
+        System.out.println("JAR compatibility and exact-cohort verification: "+checks+" checks passed (no runtime launch)");
     }
 }
