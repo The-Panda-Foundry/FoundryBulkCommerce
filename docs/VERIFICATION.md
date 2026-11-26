@@ -1,5 +1,10 @@
 # Verification and review disposition
 
+## Current dependency maintenance — 26 November 2026
+
+Bulk Commerce0.2.2: new confirmed Core1.5.43.2504/Storage1.6.22.2244/Backpacks3.26.23.2263 and old complete set both pass2424 executable checks and10 actual required GameTests using the same new-compiled binary/classes. New-set optional-absent run passes5 active and5 guarded optional cases. Mixed/unknown exact fingerprints are refused; no verification bypass. Native ledger history/schema/instance remain compatible. Detailed comparison, API review, exact hashes, isolated integrated-launch blocker and qualification: DEPENDENCY_COMPATIBILITY_2026-11-26.md. Installation/rollback: DEPENDENCY_MAINTENANCE_INSTALL.md. Earlier versioned evidence below is historical.
+
+
 ## Current v0.2.1 final release candidate — 25 November 2026
 
 The architect reports extensive integrated and initial dedicated v0.2.0 functional success. Preserved source04d165f under annotated baseline/v0.2.0 before the notification-only change. This candidate still needs the final target-host gates in RELEASE_0_2_1.md; earlier versioned evidence below remains historical.

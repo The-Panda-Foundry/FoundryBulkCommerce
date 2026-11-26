@@ -1,6 +1,6 @@
 # Configuration and the six distinct limits
 
-Version 0.2.1, **25 November 2026**. NeoForge file: `<world>/serverconfig/foundrybulkcommerce-server.toml`. Existing values are retained; v0.2.1 retains all existing defaults/ranges and adds showTransactionMessages=false. Restart the world/server after edits for a repeatable acceptance run.
+Version 0.2.2, **25 November 2026**. NeoForge file: `<world>/serverconfig/foundrybulkcommerce-server.toml`. Existing values are retained; v0.2.2 preserves saved values and uses the explicitly requested fresh bulkTransactionLimit default230400; no key is renamed. Restart the world/server after edits for a repeatable acceptance run.
 
 | Concept | Owner / value | Effect |
 | --- | --- | --- |
@@ -19,13 +19,13 @@ Version 0.2.1, **25 November 2026**. NeoForge file: `<world>/serverconfig/foundr
 | sophisticatedBackpacks | true | Include supported hotbar backpacks when installed |
 | debugTransactions | false | INFO phases, per-source rejection categories and work counters when true; independent of player chat |
 | showTransactionMessages | false | Show routine preparation/success chat and references when true; failures/security remain visible |
-| bulkTransactionLimit | 2304 | 1–1,048,576 items |
+| bulkTransactionLimit | 230400 | 1–1,048,576 items |
 | serverInstanceId | empty | Generate/persist UUID, or initial explicit 1–64 letters/digits/_.:- |
 | requestIntervalMillis | 250 | 50–60,000 ms; global admission interval |
 | maxScannedSlots | 4096 | 64–32,768 inspections and per-container inventory-capacity ceiling |
 | maxSnapshotBytes | 1,048,576 | 16,384–4,194,304 bytes |
 
-BC-002 is resolved by existing configuration. For the four Netherite examples (up to 33,792 wheat), a test bulkTransactionLimit of **65,536** permits all complete bundles in one request. At 2,304 wheat per Spur, outcomes are 3/7/11/14 Spurs with 1,536/768/0/1,536 left. That is an acceptance-test setting, not a measured recommendation for production throughput. The default remains 2,304. Any remainder stays in the original containers. A bundle larger than the transaction limit cannot be sold and is diagnosed as validation failure.
+BC-002 is resolved by existing configuration. For the four Netherite examples (up to 33,792 wheat), a test bulkTransactionLimit of **65,536** permits all complete bundles in one request. At 2,304 wheat per Spur, outcomes are 3/7/11/14 Spurs with 1,536/768/0/1,536 left. That is an acceptance-test setting, not a measured recommendation for production throughput. The fresh default is230,400; existing saved values are retained. Any remainder stays in the original containers. A bundle larger than the transaction limit cannot be sold and is diagnosed as validation failure.
 
 Changing the transaction limit does not change prices, shop bundle configuration, storage slots, UUID eligibility, scanning budgets or snapshot budgets. Do not increase scan/serialization limits to mask an unknown rejection. First enable debugTransactions, capture the reference and exact category, then compare actual legitimate capacity/work with the configured budget. Keep the one-active-transaction policy, cooldown and host load measurements in mind.
 
@@ -62,3 +62,8 @@ These are independent server-side options. The actual existing key is debugTrans
 | Diagnostic/startup/error logging | Controlled by existing log/debug settings | Same |
 
 The option is read only at the two routine-chat call sites. It is not captured as an economic validation field, does not skip prepare/commit/outcome calls and does not gate inventory/Treasury UI refresh. A change while an intent is pending only changes which later message is shown. Requests rejected before durable preparation retain their existing diagnostic reference behaviour; this release does not add ledger rows for pre-intent rejections. Administrators can find successful quiet-sale references through recent/player/inspect.
+
+
+## 26 November2026 maintenance clarification
+
+The accepted0.2.1 binary's compiled item-limit default was2304, while the architect's approved active setting is230400. This release sets only the fresh/missing-key default to230400 as explicitly requested. It never replaces a deployed TOML file or resets a saved value. Range1–1048576, work/byte budgets, global interval and arithmetic are unchanged. Existing debugTransactions=false and showTransactionMessages=false remain; transactionDebug is still the startup label, not a renamed/new config key. Ledger schema, server instance binding and historical references are unchanged.

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.2 — 26 November 2026 — dependency maintenance
+
+- Validate confirmed new Core1.5.43.2504, Storage1.6.22.2244 and Backpacks3.26.23.2263 exact JARs; retain independently retested old complete cohort.
+- Update compile inputs and precise metadata alternatives; strict off-thread runtime hashes accept complete verified cohorts and reject unknown/mixed builds. Economy/Create/equipment libraries unchanged.
+- Preserve transaction/storage/ledger/Mixin class bytes and all existing features. No schema/history/instance migration, notification behaviour change or production deployment.
+- Set explicitly requested fresh bulkTransactionLimit default230400 while retaining existing saved values, debugTransactions=false and showTransactionMessages=false; no config key rename.
+- Document complete comparison/API review, both-cohort/optional-absent regression, native request-network change, integrated launch environment blocker and coherent rollback requirements.
+
 ## 0.2.1 — 25 November 2026 — final release candidate
 
 - Add showTransactionMessages=false, independently of debugTransactions. Suppress only routine preparation/success chat and their references by default; retain failure/rejection/security/circuit-breaker messages, ledger evidence and administrator commands.

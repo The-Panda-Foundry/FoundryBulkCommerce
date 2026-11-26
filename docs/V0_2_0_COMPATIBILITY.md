@@ -1,3 +1,5 @@
+Current maintenance note (26 November2026): this storage tier/upgrade matrix is retained unchanged in0.2.2 and was rerun on both exact old/new native cohorts. See DEPENDENCY_COMPATIBILITY_2026-11-26.md for the new versions/hashes and native network qualification.
+
 # v0.2.0 / v0.2.1 storage compatibility matrix
 
 The v0.2.1 adapters are byte-identical to accepted v0.2.0; the matrix below is unchanged. Final release validation status is in RELEASE_0_2_1.md.

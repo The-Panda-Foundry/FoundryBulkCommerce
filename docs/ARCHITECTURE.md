@@ -130,3 +130,8 @@ No Backpacks networking, equipment selling, nested traversal, remote storage, au
 ## v0.2.1 presentation-only option
 
 showTransactionMessages defaults false. Two local guards suppress routine preparation and APPLIED_MEMORY success chat only. Non-success outcome chat, source rejection warnings, tracing, worker calls, extraction/payment/compensation, UI refresh, admission/containment and audit commands remain on the same paths. Config is read at notification time and is deliberately absent from Plan's economic revalidation fields. No schema migration, lifecycle/Mixin change or new persistence primitive is introduced. Critical disconnect/admission warnings are sent by the existing ledger paths independently of this option.
+
+
+## 26 November2026 dependency verification maintenance
+
+RuntimeCompatibility captures the same runtime paths on the server thread and hashes only on the existing ledger worker. Two explicit known hash maps represent independently tested complete Sophisticated sets. Installed family members must match one map; no cartesian old/new acceptance, version-only fallback or disabled-adapter bypass. Exact economy/equipment pins stay unchanged. Native storage/transaction/ledger/Mixin code and schema are unchanged. The default-limit adjustment affects only fresh/missing configuration values. See DEPENDENCY_COMPATIBILITY_2026-11-26.md for API changes and independently tested preservation.
