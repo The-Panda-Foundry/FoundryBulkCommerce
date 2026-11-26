@@ -1,0 +1,73 @@
+{
+  "status": "PROPOSED / incomplete; owner approval required",
+  "date": "2026-11-26",
+  "Foundry_application": {
+    "revision": "f61593059b337b9acdcd4603349b59834f56cc34 plus documentation-only proposal commit",
+    "materials": [
+      "src/main including Mixins/resources/configuration",
+      "build.gradle/settings.gradle/gradle.properties",
+      "Gradle wrapper/scripts and plugin/repository definitions",
+      "src/test/src/gameTest and synthetic templates",
+      "exact reference SHA/version/coordinate manifest",
+      "adopted application exception and notices",
+      "recipient rebuild/install/change instructions"
+    ],
+    "available": true
+  },
+  "Numismatics": {
+    "binary_version": "1.1.0+neoforge-mc1.21.1",
+    "sha256": "d33a33b46f923462ae6806a024851afaefa473ced0e95bf405f8ebc13abce767",
+    "candidate_source_commit": "b4cbb96f5cd2fbec80fdbb2f6f3cc3abcd4f6bf5",
+    "repository": "https://github.com/Layers-of-Railways/CreateNumismatics",
+    "evidence": "Candidate is recorded build commit; fetched LGPL text, BankAccount source header (Copyright2023-2026 The Railways Team, LGPL3-or-later) and properties verify1.1.0/MC1.21.1. Not a reproducible-build attestation.",
+    "missing": [
+      "complete exact-source/materials acquisition and source-to-artifact verification",
+      "native build instructions/resources/mappings/dependencies and any patches",
+      "appropriate durable source availability/redistribution method",
+      "runtime transformation provenance/classification"
+    ]
+  },
+  "Curios": {
+    "version": "9.5.1+1.21.1",
+    "sha256": "a45df2125c26219974aba7507ffc9afe7b83acc941a386af3faacb1cc0056fde",
+    "repository": "https://github.com/TheIllusiveC4/Curios",
+    "license": "LGPL3-or-later, original copyright notice prepared",
+    "missing": [
+      "complete source archive/material acquisition and source-to-artifact verification",
+      "complete build resources/scripts and any packaging patches",
+      "durable source availability and native rebuild verification"
+    ],
+    "candidate_source_commit": "6b122c8a7e2b514fd94197459ade11f19a0bfb09",
+    "evidence": "Official1.21.1 branch history commit message9.5.1; fetched properties version9.5.1+1.21.1 and LICENSE match pinned metadata/notice. Latest branch9.6.1 is not the candidate."
+  },
+  "other_inputs": {
+    "toolchain": [
+      "Java21",
+      "Gradle9.2.1",
+      "ModDevGradle2.0.148",
+      "NeoForge21.1.265 tested",
+      "MC1.21.1 official mappings/runtime",
+      "SQLiteJDBC3.51.3.0"
+    ],
+    "external_mods": [
+      "Treasury1.0.2 disputed MIT/ARR",
+      "Create6.0.10",
+      "coherent exact Sophisticated cohort",
+      "Accessories and Owo for equipped tests"
+    ],
+    "note": "General-purpose toolchain/System Library exclusions require correct classification; do not assume Minecraft/proprietary mods can be redistributed. Identify source needed under the selected route instead of making blanket exemptions."
+  },
+  "release_documents": [
+    "GPL3 full text",
+    "LGPL3 full text",
+    "upstream notices/source access directions",
+    "adopted ARR application exception",
+    "Mixin inputs/change notices as applicable",
+    "installation information when required"
+  ],
+  "not_needed": [
+    "production secrets",
+    "private signing keys not actually required for this addon",
+    "live inventories/bank/ledger databases"
+  ]
+}

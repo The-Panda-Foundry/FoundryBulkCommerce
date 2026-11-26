@@ -19,3 +19,5 @@ Prepared26 November2026. Current mod version0.2.3. This checklist is not publica
 - [ ] Normal Java21 Gradle regression build and actual-mod GameTests must pass; distinguish these from target-host GUI, remote-client, load and crash acceptance. Consult existing staging/manual-recovery documents.
 - [ ] Approve the final README, changelog, SECURITY, CONTRIBUTING, templates and ARR licence. Public source is not represented as open source. No copied upstream assets/implementation may be added without review.
 - [ ] Only after owner approval, configure the actual GitHub remote and carry out a separately authorized push/publication. No push, repository creation, settings change, release tag or deployment is performed by this preparation task.
+
+Licensing proposal and recipient-build/source-material checklist: licensing/PROPOSAL.md. No exception is adopted until owner approval. Private-report setup, including public-repository prerequisite: GITHUB_PRIVATE_REPORTING.md. Original history remains retained pending final owner approval.

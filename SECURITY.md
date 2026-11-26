@@ -4,7 +4,7 @@
 
 Item/currency duplication, permission bypass, identity spoofing and transaction/ledger vulnerabilities must not be posted in public issues, discussions or comments.
 
-Once enabled on the public repository, use **Security → Report a vulnerability** to submit a private GitHub vulnerability report to the maintainers. Include the addon/loader/dependency versions, a minimal disposable-world reproduction, expected/observed results and possible impact. Attach only the smallest redacted evidence needed; never upload production databases, complete inventories, passwords or account dumps. Do not exploit production servers or affect other players to demonstrate a report.
+Once enabled on the public repository, use **Security and quality (Security) → Advisories → Report a vulnerability** to submit a private GitHub vulnerability report to the maintainers. Include the addon/loader/dependency versions, a minimal disposable-world reproduction, expected/observed results and possible impact. Attach only the smallest redacted evidence needed; never upload production databases, complete inventories, passwords or account dumps. Do not exploit production servers or affect other players to demonstrate a report.
 
 If that private-report button is unavailable, do not publish exploit details. Use an already-established private conversation with a project maintainer to request a secure reporting route before sharing evidence. No security email address is specified because an owner-approved mailbox has not been established. Enabling and testing GitHub private reporting is a publication prerequisite; adding this file does not enable that setting.
 
@@ -13,3 +13,5 @@ Maintainers assess reports privately, preserve evidence and coordinate remediati
 ## Supported scope
 
 Review targets the latest maintained release (currently0.2.3) on its exact validated dependency cohorts. Reports affecting older versions are welcome but do not imply continued fixes for every historical build. The addon’s ledger does not guarantee cross-resource disk atomicity. See docs/RECOVERY.md for containment and manual reconciliation; never clear evidence or automatically refund/replay uncertain transactions.
+
+Owner activation/benign verification instructions: [docs/GITHUB_PRIVATE_REPORTING.md](docs/GITHUB_PRIVATE_REPORTING.md). GitHub documents this route for public repositories; an approved safe bootstrap or actual private contact must be arranged before releasing code/binaries. No reporting setting was enabled by this document.
