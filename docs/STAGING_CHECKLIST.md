@@ -1,3 +1,5 @@
+**26 November 2026, BC-004 v0.2.3:** Complete the new reviewed-upgrade/resource-preservation and dedicated gates in [BC_004_INSTALLATION.md](BC_004_INSTALLATION.md) in addition to this existing checklist. Earlier live acceptance does not certify this patch.
+
 # v0.2.1 dedicated-server final validation
 
 Prepared **25 November 2026**. No production deployment is authorized or performed. The architect reports initial v0.2.0 dedicated functional success; full host persistence/concurrency/performance/crash qualification and v0.2.1 notification acceptance remain outstanding. Automated headless tests are not substitutes for these checks.

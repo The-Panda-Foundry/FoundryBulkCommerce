@@ -1,3 +1,5 @@
+**BC-004 update, 26 November 2026:** Tier/stack matrices below remain valid; historical blanket non-stack exclusions are superseded by [the v0.2.3 upgrade policy](BC_004_UPGRADE_COMPATIBILITY.md). Reviewed ordinary upgrades and validated backpack tank/battery layouts are now supported.
+
 # v0.1.2 shulker compatibility and BC-001 investigation
 
 **Historical v0.1.2 report. For current hotbar eligibility and Backpacks support, use V0_2_0_COMPATIBILITY.md.** The architect has since confirmed successful v0.1.2 integrated acceptance; the pending statements below describe delivery-time status.

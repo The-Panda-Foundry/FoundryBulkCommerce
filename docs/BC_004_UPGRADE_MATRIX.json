@@ -1,0 +1,772 @@
+{
+  "sophisticatedbackpacks:advanced_alchemy_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.alchemy.AlchemyUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.alchemy.AlchemyUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:advanced_compacting_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.compacting.CompactingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.compacting.CompactingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:advanced_deposit_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedbackpacks.upgrades.deposit.DepositUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedbackpacks.upgrades.deposit.DepositUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:advanced_feeding_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.feeding.FeedingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.feeding.FeedingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:advanced_filter_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.filter.FilterUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.filter.FilterUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:advanced_jukebox_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.jukebox.JukeboxUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.jukebox.JukeboxUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:advanced_magnet_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.magnet.MagnetUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.magnet.MagnetUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:advanced_mob_catcher_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedbackpacks.upgrades.mobcatcher.MobCatcherUpgradeItem",
+      "policy": "RESTRICTED"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedbackpacks.upgrades.mobcatcher.MobCatcherUpgradeItem",
+      "policy": "RESTRICTED"
+    }
+  },
+  "sophisticatedbackpacks:advanced_pickup_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.pickup.PickupUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.pickup.PickupUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:advanced_pump_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.pump.PumpUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.pump.PumpUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:advanced_refill_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedbackpacks.upgrades.refill.RefillUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedbackpacks.upgrades.refill.RefillUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:advanced_restock_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedbackpacks.upgrades.restock.RestockUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedbackpacks.upgrades.restock.RestockUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:advanced_tool_swapper_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedbackpacks.upgrades.toolswapper.ToolSwapperUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedbackpacks.upgrades.toolswapper.ToolSwapperUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:advanced_void_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.voiding.VoidUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.voiding.VoidUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:alchemy_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.alchemy.AlchemyUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.alchemy.AlchemyUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:anvil_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedbackpacks.upgrades.anvil.AnvilUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedbackpacks.upgrades.anvil.AnvilUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:auto_blasting_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.AutoBlastingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.AutoBlastingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:auto_smelting_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.AutoSmeltingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.AutoSmeltingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:auto_smoking_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.AutoSmokingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.AutoSmokingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:battery_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.battery.BatteryUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.battery.BatteryUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:blasting_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.BlastingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.BlastingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:compacting_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.compacting.CompactingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.compacting.CompactingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:crafting_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.crafting.CraftingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.crafting.CraftingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:deposit_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedbackpacks.upgrades.deposit.DepositUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedbackpacks.upgrades.deposit.DepositUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:everlasting_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedbackpacks.upgrades.everlasting.EverlastingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedbackpacks.upgrades.everlasting.EverlastingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:feeding_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.feeding.FeedingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.feeding.FeedingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:filter_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.filter.FilterUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.filter.FilterUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:inception_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedbackpacks.upgrades.inception.InceptionUpgradeItem",
+      "policy": "RESTRICTED"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedbackpacks.upgrades.inception.InceptionUpgradeItem",
+      "policy": "RESTRICTED"
+    }
+  },
+  "sophisticatedbackpacks:infinity_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.infinity.InfinityUpgradeItem",
+      "policy": "RESTRICTED"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.infinity.InfinityUpgradeItem",
+      "policy": "RESTRICTED"
+    }
+  },
+  "sophisticatedbackpacks:jukebox_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.jukebox.JukeboxUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.jukebox.JukeboxUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:magnet_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.magnet.MagnetUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.magnet.MagnetUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:mob_catcher_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedbackpacks.upgrades.mobcatcher.MobCatcherUpgradeItem",
+      "policy": "RESTRICTED"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedbackpacks.upgrades.mobcatcher.MobCatcherUpgradeItem",
+      "policy": "RESTRICTED"
+    }
+  },
+  "sophisticatedbackpacks:pickup_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.pickup.PickupUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.pickup.PickupUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:pump_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.pump.PumpUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.pump.PumpUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:refill_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedbackpacks.upgrades.refill.RefillUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedbackpacks.upgrades.refill.RefillUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:restock_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedbackpacks.upgrades.restock.RestockUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedbackpacks.upgrades.restock.RestockUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:smelting_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.SmeltingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.SmeltingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:smithing_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedbackpacks.upgrades.smithing.SmithingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedbackpacks.upgrades.smithing.SmithingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:smoking_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.SmokingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.SmokingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:stonecutter_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.stonecutter.StonecutterUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.stonecutter.StonecutterUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:survival_infinity_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.infinity.InfinityUpgradeItem",
+      "policy": "RESTRICTED"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.infinity.InfinityUpgradeItem",
+      "policy": "RESTRICTED"
+    }
+  },
+  "sophisticatedbackpacks:tank_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.tank.TankUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.tank.TankUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:tool_swapper_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedbackpacks.upgrades.toolswapper.ToolSwapperUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedbackpacks.upgrades.toolswapper.ToolSwapperUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:void_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.voiding.VoidUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.voiding.VoidUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedbackpacks:xp_pump_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.xppump.XpPumpUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.xppump.XpPumpUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedstorage:advanced_alchemy_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.alchemy.AlchemyUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.alchemy.AlchemyUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedstorage:advanced_compacting_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedstorage.init.ModItems$StorageCompactingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedstorage.init.ModItems$StorageCompactingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedstorage:advanced_feeding_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.feeding.FeedingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.feeding.FeedingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedstorage:advanced_filter_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.filter.FilterUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.filter.FilterUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedstorage:advanced_hopper_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedstorage.upgrades.hopper.HopperUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedstorage.upgrades.hopper.HopperUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedstorage:advanced_jukebox_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.jukebox.JukeboxUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.jukebox.JukeboxUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedstorage:advanced_magnet_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.magnet.MagnetUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.magnet.MagnetUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedstorage:advanced_pickup_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.pickup.PickupUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.pickup.PickupUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedstorage:advanced_pump_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedstorage.upgrades.TankPumpUpgradeItem",
+      "policy": "RESTRICTED"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.pump.PumpUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedstorage:advanced_void_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.voiding.VoidUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.voiding.VoidUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedstorage:alchemy_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.alchemy.AlchemyUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.alchemy.AlchemyUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedstorage:auto_blasting_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.AutoBlastingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.AutoBlastingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedstorage:auto_smelting_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.AutoSmeltingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.AutoSmeltingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedstorage:auto_smoking_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.AutoSmokingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.AutoSmokingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedstorage:blasting_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.BlastingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.BlastingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedstorage:compacting_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedstorage.init.ModItems$StorageCompactingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedstorage.init.ModItems$StorageCompactingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedstorage:compression_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedstorage.upgrades.compression.CompressionUpgradeItem",
+      "policy": "RESTRICTED"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedstorage.upgrades.compression.CompressionUpgradeItem",
+      "policy": "RESTRICTED"
+    }
+  },
+  "sophisticatedstorage:crafting_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.crafting.CraftingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.crafting.CraftingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedstorage:feeding_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.feeding.FeedingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.feeding.FeedingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedstorage:filter_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.filter.FilterUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.filter.FilterUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedstorage:hopper_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedstorage.upgrades.hopper.HopperUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedstorage.upgrades.hopper.HopperUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedstorage:infinity_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.infinity.InfinityUpgradeItem",
+      "policy": "RESTRICTED"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.infinity.InfinityUpgradeItem",
+      "policy": "RESTRICTED"
+    }
+  },
+  "sophisticatedstorage:jukebox_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.jukebox.JukeboxUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.jukebox.JukeboxUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedstorage:magnet_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.magnet.MagnetUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.magnet.MagnetUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedstorage:pickup_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.pickup.PickupUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.pickup.PickupUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedstorage:pump_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedstorage.upgrades.TankPumpUpgradeItem",
+      "policy": "RESTRICTED"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.pump.PumpUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedstorage:smelting_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.SmeltingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.SmeltingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedstorage:smoking_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.SmokingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.cooking.SmokingUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedstorage:stonecutter_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.stonecutter.StonecutterUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.stonecutter.StonecutterUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedstorage:survival_infinity_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.infinity.InfinityUpgradeItem",
+      "policy": "RESTRICTED"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.infinity.InfinityUpgradeItem",
+      "policy": "RESTRICTED"
+    }
+  },
+  "sophisticatedstorage:void_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.voiding.VoidUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.voiding.VoidUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  },
+  "sophisticatedstorage:xp_pump_upgrade": {
+    "new": {
+      "class": "net.p3pp3rf1y.sophisticatedstorage.upgrades.TankXpPumpUpgradeItem",
+      "policy": "RESTRICTED"
+    },
+    "old": {
+      "class": "net.p3pp3rf1y.sophisticatedcore.upgrades.xppump.XpPumpUpgradeItem",
+      "policy": "PRIMARY_ONLY"
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "date": "2026-11-26",
+  "artifact": "foundrybulkcommerce-0.2.3.jar",
+  "sha256": "2f082e085e8cf20e3b9e1fd55fe1a4589a66dcb2615a0d52c419a68e1dd9f7a8",
+  "comparison_baseline": "foundrybulkcommerce-0.2.2.jar",
+  "changed_classes": [
+    "com/pandafoundry/bulkcommerce/BulkSales.class",
+    "com/pandafoundry/bulkcommerce/FoundryBulkCommerce.class",
+    "com/pandafoundry/bulkcommerce/storage/BackpackSources$CanonicalSource$1.class",
+    "com/pandafoundry/bulkcommerce/storage/BackpackSources$CanonicalSource.class",
+    "com/pandafoundry/bulkcommerce/storage/BackpackSources.class",
+    "com/pandafoundry/bulkcommerce/storage/CanonicalContents$Match.class",
+    "com/pandafoundry/bulkcommerce/storage/CanonicalContents$Parsed.class",
+    "com/pandafoundry/bulkcommerce/storage/CanonicalContents.class"
+  ],
+  "added_classes": [
+    "com/pandafoundry/bulkcommerce/storage/UpgradePolicy.class"
+  ],
+  "removed_classes": [],
+  "addon_class_count": 46,
+  "nested_dependencies_sha256": {
+    "META-INF/jarjar/sqlite-jdbc-3.51.3.0.jar": "3684ac5e9bd893cbe68eb0ac1708343f66be829b1d2b5ab317e783d05acd5aef"
+  },
+  "all_classes_java21_major65": true,
+  "test_or_fixture_entries": [],
+  "byte_identical_safety_subsystems": [
+    "BulkConfig",
+    "Transaction coordinator",
+    "all ledger classes",
+    "all Mixins",
+    "RuntimeCompatibility"
+  ],
+  "bulksales_bytecode_difference": "Only inlined addonVersion string 0.2.2 -> 0.2.3; source unchanged",
+  "other_changed_inner_classes_note": "Storage method placement/source line tables changed; CanonicalContents nested record definitions and canonical edit logic remain unchanged."
+}

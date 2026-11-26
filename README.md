@@ -1,8 +1,8 @@
 # Foundry: Bulk Commerce
 
-**v0.2.2 dependency-maintenance candidate — 26 November 2026.** The architect reports v0.2.1 production deployment; this maintenance candidate has not been deployed. Minecraft1.21.1, Java21, NeoForge21.1.x. Same feature-complete hotbar selling and transaction safeguards. [Exact comparison, API assessment and tests](docs/DEPENDENCY_COMPATIBILITY_2026-11-26.md).
+**v0.2.3 BC-004 compatibility candidate — 26 November 2026.** Permits reviewed ordinary upgrades alongside stack upgrades while selling only primary inventory contents. Not deployed by this work. Minecraft1.21.1, Java21, NeoForge21.1.x. [Upgrade policy, restrictions and regression evidence](docs/BC_004_UPGRADE_COMPATIBILITY.md). [Exact comparison, API assessment and tests](docs/DEPENDENCY_COMPATIBILITY_2026-11-26.md).
 
-Preserved default: `showTransactionMessages=false` suppresses routine preparation/success chat and their references. Meaningful failures, rejections, security warnings and emergency containment remain visible. Ledger entries/references, read-only audits, UI refresh and diagnostics are unchanged. The actual server logging key is `debugTransactions` (not `transactionDebug`); it independently controls diagnostic logs. See the [maintenance installation/rollback instructions](docs/DEPENDENCY_MAINTENANCE_INSTALL.md); the earlier [transaction durability review](docs/RELEASE_0_2_1.md) remains applicable.
+Preserved default: `showTransactionMessages=false` suppresses routine preparation/success chat and their references. Meaningful failures, rejections, security warnings and emergency containment remain visible. Ledger entries/references, read-only audits, UI refresh and diagnostics are unchanged. The actual server logging key is `debugTransactions` (not `transactionDebug`); it independently controls diagnostic logs. See the [BC-004 installation/rollback instructions](docs/BC_004_INSTALLATION.md); the earlier [transaction durability review](docs/RELEASE_0_2_1.md) remains applicable.
 
 Put eligible containers in **any of hotbar slots 0–8**, open the existing Treasury interface and click Sell All. The selected slot does not matter. Containers in the remaining inventory, offhand, armour, Curios and Accessories are protected. Loose matching items retain Treasury's ordinary main-inventory behaviour (slots 0–35). Nested containers are never traversed or sold as commodities.
 
@@ -13,11 +13,11 @@ Hotbar eligibility is unchanged from accepted v0.2.1. Preserve existing transact
 | Source | Extraction |
 | --- | --- |
 | Vanilla shulker boxes | Hotbar only, all colours, 27 slots |
-| Sophisticated Storage 1.6.22.2244 / validated old1.6.2.2159 | All six shulker tiers; supported passive stack modifiers |
-| Sophisticated Backpacks 3.26.23.2263 / validated old3.26.9.2195 | Optional; all six backpack tiers; nine passive stack modifiers including Omega |
+| Sophisticated Storage 1.6.22.2244 / validated old1.6.2.2159 | All six shulker tiers; stack modifiers and reviewed ordinary upgrades |
+| Sophisticated Backpacks 3.26.23.2263 / validated old3.26.9.2195 | Optional; all six backpack tiers; stack modifiers including Omega and reviewed ordinary upgrades |
 | Equipped, offhand, main-inventory containers outside hotbar | Identity checks only; contents never decoded for sale |
 | Linked/remote, placed, nested, legacy embedded storage | Excluded |
-| Non-stack processing upgrades, creative/infinite partitions, unverified layouts | Excluded safely |
+| Inception, compression, infinity, mob catching, unreviewed classes/layouts | Excluded safely; see BC-004 matrix |
 
 [Complete shulker/backpack capacity and upgrade matrix](docs/V0_2_0_COMPATIBILITY.md). Uses the actual canonical Sophisticated repositories, API capacities and modern saved components. No hardcoded production tier/item allowlist. Full identity/upgrade/settings/metadata preservation is verified before payment. Unknown dependency builds fail closed by exact SHA-256, even when their version strings match.
 
@@ -25,7 +25,7 @@ Storage and Backpacks use independent SavedData repositories. Identities are **r
 
 ## Installation and configuration
 
-Dedicated server: replace the old addon with **only** `foundrybulkcommerce-0.2.2.jar` and restart. Multiplayer clients need their normal modpack, **without needing Bulk Commerce**. Single-player hosts install the addon locally; its logical server handles transactions. No new screens, packets or client registry entries are introduced. Real absent-addon client handshake remains a staging gate; integrated gameplay is confirmed only for the reported manual scenarios.
+Dedicated server: replace the old addon with **only** `foundrybulkcommerce-0.2.3.jar` and restart. Multiplayer clients need their normal modpack, **without needing Bulk Commerce**. Single-player hosts install the addon locally; its logical server handles transactions. No new screens, packets or client registry entries are introduced. Real absent-addon client handshake remains a staging gate; integrated gameplay is confirmed only for the reported manual scenarios.
 
 Required economy references: Treasury 1.0.2, Create Numismatics 1.1.0 and their usual Create dependencies. Optional integrations: exact old/new Sophisticated cohorts (Core1.5.7.2381 or1.5.43.2504), unchanged Curios 9.5.1 and Accessories 1.1.0-beta.53 reference builds. The addon does not supply those mods. **Commerce Fixtures is excluded and must not be installed on production.** SQLite JDBC 3.51.3.0 is bundled via NeoForge Jar-in-Jar; see [notices](THIRD_PARTY_NOTICES.md).
 
@@ -82,7 +82,7 @@ export JAVA_HOME=$(/usr/libexec/java_home -v 21)
 
 Override paths with `-PdependencyDir=...` (unchanged economy references), `-PcoreJar=...`, `-PstorageJar=...`, `-PbackpacksJar=...`, `-PcuriosJar=...`, `-PaccessoriesJar=...`. Optional APIs are required to compile their adapters, not to run the production addon. Optional runtime flags remain effective when all compile references share dependencies/. `--offline` reuses a populated Gradle cache. No originals are modified, tracked or redistributed.
 
-`build` invokes five executable JavaExec suites through `check` (2,424 checks), rather than JUnit tests. GameTests additionally load actual mods/Mixins, bank, canonical repositories and native SQLite. Read actual required-test success lines, not just Gradle's exit. Output: `build/libs/foundrybulkcommerce-0.2.2.jar` and sources JAR. Test-only fixtures are never packaged in the production addon. Development run worlds are disposable; never use production data.
+`build` invokes five executable JavaExec suites through `check` (2,424 checks), rather than JUnit tests. GameTests additionally load actual mods/Mixins, bank, canonical repositories and native SQLite. Read actual required-test success lines, not just Gradle's exit. Output: `build/libs/foundrybulkcommerce-0.2.3.jar` and sources JAR. Test-only fixtures are never packaged in the production addon. Development run worlds are disposable; never use production data.
 
 [Verification and limitations](docs/VERIFICATION.md) · [performance](docs/PERFORMANCE.md) · [integrated acceptance](docs/INTEGRATED_ACCEPTANCE.md) · [dedicated staging](docs/STAGING_CHECKLIST.md). Accepted baselines are preserved by tags `baseline/v0.1.2` and `baseline/v0.2.0`. The architect reports v0.2.0 integrated and initial dedicated functional success; remaining detailed host/client-handshake, persistence, concurrency, performance and crash gates are listed in the final release review. No extra upgraded-backpack live cases are inferred from that summary.
 

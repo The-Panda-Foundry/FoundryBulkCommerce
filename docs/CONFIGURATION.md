@@ -1,6 +1,6 @@
 # Configuration and the six distinct limits
 
-Version 0.2.2, **25 November 2026**. NeoForge file: `<world>/serverconfig/foundrybulkcommerce-server.toml`. Existing values are retained; v0.2.2 preserves saved values and uses the explicitly requested fresh bulkTransactionLimit default230400; no key is renamed. Restart the world/server after edits for a repeatable acceptance run.
+Version 0.2.3, **26 November 2026**. NeoForge file: `<world>/serverconfig/foundrybulkcommerce-server.toml`. Existing values are retained; v0.2.2 preserves saved values and uses the explicitly requested fresh bulkTransactionLimit default230400; no key is renamed. Restart the world/server after edits for a repeatable acceptance run.
 
 | Concept | Owner / value | Effect |
 | --- | --- | --- |

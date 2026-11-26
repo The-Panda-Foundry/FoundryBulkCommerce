@@ -1,3 +1,5 @@
+**26 November 2026, BC-004 v0.2.3:** Complete the new reviewed-upgrade/resource-preservation and integrated gates in [BC_004_INSTALLATION.md](BC_004_INSTALLATION.md) in addition to this existing checklist. Earlier live acceptance does not certify this patch.
+
 # v0.2.1 integrated-server final regression
 
 Prepared **25 November 2026**. The architect has reported successful standard-tier/mixed/hotbar/protected/partial-sale scenarios in LIVE_ACCEPTANCE_2026-11-25.md. Boxes below are the full regression protocol; they remain unchecked because broader rows include unverified subcases. Automated results are in VERIFICATION.md. Use a disposable copy and the full Panda Foundry modpack, Java 21 / NeoForge 21.1.256. Do not test failure boundaries in a valuable world.

@@ -1,3 +1,5 @@
+**BC-004 update, 26 November 2026:** Tier/stack matrices below remain valid; historical blanket non-stack exclusions are superseded by [the v0.2.3 upgrade policy](BC_004_UPGRADE_COMPATIBILITY.md). Reviewed ordinary upgrades and validated backpack tank/battery layouts are now supported.
+
 Current maintenance note (26 November2026): this storage tier/upgrade matrix is retained unchanged in0.2.2 and was rerun on both exact old/new native cohorts. See DEPENDENCY_COMPATIBILITY_2026-11-26.md for the new versions/hashes and native network qualification.
 
 # v0.2.0 / v0.2.1 storage compatibility matrix

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.3 — 26 November 2026 (BC-004)
+
+- Replace shared stack-only eligibility with explicit reviewed-class validation for ordinary Sophisticated upgrades. Preserve primary-only extraction; never sell upgrade items, ghost filters, crafting/cooking contents, fluids or energy.
+- Validate legitimate backpack tank/battery column layouts against installed upgrade APIs. Keep nested, virtual, infinite and unreviewed storage restricted.
+- Add native multi-upgrade, auxiliary-state, compensation and real Treasury/SQLite regressions. Existing transaction, ledger, identity, hotbar, notification and dependency safeguards remain unchanged.
+- No schema migration, new configuration, production deployment or Commerce Fixtures inclusion. See docs/BC_004_UPGRADE_COMPATIBILITY.md and docs/BC_004_INSTALLATION.md.
+
 ## 0.2.2 — 26 November 2026 — dependency maintenance
 
 - Validate confirmed new Core1.5.43.2504, Storage1.6.22.2244 and Backpacks3.26.23.2263 exact JARs; retain independently retested old complete cohort.
