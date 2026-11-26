@@ -42,8 +42,7 @@ public final class BackpackSources {
                 if (stack.getCount() != 1 || !id.getNamespace().equals("sophisticatedbackpacks")
                         || stack.has(ModCoreDataComponents.LINKED_STORAGE_ENDPOINT)
                         || stack.has(DataComponents.BLOCK_ENTITY_DATA) || stack.has(DataComponents.CUSTOM_DATA)
-                        || stack.has(ModDataComponents.LOOT_TABLE.get()) || stack.has(ModDataComponents.TEMPLATE_NAME.get())
-                        || stack.getOrDefault(ModDataComponents.COLUMNS_TAKEN.get(),0) != 0)
+                        || stack.has(ModDataComponents.LOOT_TABLE.get()) || stack.has(ModDataComponents.TEMPLATE_NAME.get()))
                     throw new SaleRejection(UNSUPPORTED_STORAGE, "Linked, legacy or unverified storage item");
                 if (uuid == null) continue; // Empty new storage: no migration, UUID or wrapper allocation.
                 if (!StorageIdentities.unique(identities,"backpack",uuid)) throw new SaleRejection(DUPLICATE_UUID, "Duplicate carried storage identity");
@@ -52,7 +51,7 @@ public final class BackpackSources {
                 // The getNumber... APIs mutate outer components. Use the non-mutating defaults plus modern saved components.
                 int capacity = Math.max(((BackpackItem)stack.getItem()).getNumberOfSlots(), stack.getOrDefault(ModCoreDataComponents.NUMBER_OF_INVENTORY_SLOTS, 0));
                 int upgradeSlots = Math.max(((BackpackItem)stack.getItem()).getNumberOfUpgradeSlots(), stack.getOrDefault(ModCoreDataComponents.NUMBER_OF_UPGRADE_SLOTS, 0));
-                CanonicalContents.Parsed parsed = CanonicalContents.parse(player.registryAccess(), root, template, budget, capacity, upgradeSlots,"sophisticatedbackpacks");
+                CanonicalContents.Parsed parsed = CanonicalContents.parse(player.registryAccess(), root, template, budget, capacity, upgradeSlots,"sophisticatedbackpacks",stack.getOrDefault(ModDataComponents.COLUMNS_TAKEN.get(),0));
                 if (parsed.matching() > 0) sources.add(new CanonicalSource(player, i, stack, uuid, root.copy(), parsed.matching(), parsed.matches()));
             } catch (SaleRejection failure) {
                 if (failure.reason() == SCAN_LIMIT || failure.reason() == SNAPSHOT_LIMIT) throw failure;
@@ -80,7 +79,8 @@ public final class BackpackSources {
                 public boolean isAfter() { return matches(after); }
                 private void write(CompoundTag value) {
                     BackpackStorage.get().setBackpackContents(uuid, value.copy());
-                    // Reset only an existing wrapper. No added cache entries, global invalidations or upgrade hooks.
+                    // Reset only an existing wrapper; native refresh callbacks remain observable in full-root verification.
+                    // No added cache entries, global invalidation or extraction/automation hooks.
                     BackpackWrapper.fromExistingData(reference).ifPresent(w -> w.onContentsNbtUpdated());
                     player.getInventory().setChanged();
                 }

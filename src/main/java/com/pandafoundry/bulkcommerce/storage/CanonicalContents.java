@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -12,7 +11,6 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
-import net.p3pp3rf1y.sophisticatedcore.upgrades.stack.StackUpgradeItem;
 import static com.pandafoundry.bulkcommerce.storage.SaleRejection.Reason.*;
 
 
@@ -41,6 +39,9 @@ final class CanonicalContents {
         catch (RuntimeException malformed) { throw reject(INVALID_DATA, "Stored item cannot be decoded"); }
     }
     static Parsed parse(Provider registries, CompoundTag contents, ItemStack template, ScanBudget budget, int capacity, int upgradeCapacity, String upgradeNamespace) {
+        return parse(registries,contents,template,budget,capacity,upgradeCapacity,upgradeNamespace,0);
+    }
+    static Parsed parse(Provider registries, CompoundTag contents, ItemStack template, ScanBudget budget, int capacity, int upgradeCapacity, String upgradeNamespace,int columnsTaken) {
         CompoundTag inventory = compound(contents, "inventory");
         if (!inventory.contains("Size", Tag.TAG_INT)) throw reject(INVALID_DATA, "Invalid inventory size type");
         int size = inventory.getInt("Size");
@@ -55,6 +56,7 @@ final class CanonicalContents {
             if (base.length != 1 || base[0] != 0 || names.size() != 1 || !names.getString(0).equals("default"))
                 throw reject(UNSUPPORTED_STORAGE, "Non-default or infinite partition");
         }
+        int upgradeColumns=0;
         if (contents.contains("upgradeInventory")) {
             CompoundTag upgrades = compound(contents, "upgradeInventory");
             ListTag upgradeItems = entries(upgrades);
@@ -69,14 +71,19 @@ final class CanonicalContents {
                 if (!tag.contains("Slot", Tag.TAG_INT) || slot < 0 || slot >= upgrades.getInt("Size") || !upgradeSlots.add(slot))
                     throw reject(INVALID_DATA, "Invalid upgrade slot");
                 ItemStack upgrade = decode(registries, tag);
-                // Exact class is passive multiplier-only in the pinned Core JAR; subclass/other upgrades may have hooks.
-                if (upgrade.getItem().getClass() != StackUpgradeItem.class
-                        || !BuiltInRegistries.ITEM.getKey(upgrade.getItem()).getNamespace().equals(upgradeNamespace) || upgrade.getCount() != 1)
-                    throw reject(UNSUPPORTED_UPGRADE, "Only registered passive stack upgrades supported");
-                double multiplier = ((StackUpgradeItem)upgrade.getItem()).getStackSizeMultiplier();
-                if (!Double.isFinite(multiplier) || multiplier <= 0) throw reject(UNSUPPORTED_UPGRADE, "Invalid stack multiplier");
+                upgradeColumns=Math.addExact(upgradeColumns,UpgradePolicy.columns(upgrade,upgradeNamespace));
             }
         }
+        if(upgradeNamespace.equals("sophisticatedbackpacks")) {
+            // Same layout formula in both fingerprinted cohorts (new Core exposes InventoryLayout;
+            // the old wrapper implements the identical 9/12-column formula directly).
+            int baseColumns=capacity<=81?9:12;
+            if(columnsTaken!=upgradeColumns||columnsTaken<0||columnsTaken>=baseColumns)
+                throw reject(INVALID_DATA,"Backpack column metadata disagrees with installed upgrades");
+            int rows=Math.floorDiv(Math.addExact(capacity,baseColumns-1),baseColumns);
+            int usable=Math.subtractExact(capacity,Math.multiplyExact(rows,columnsTaken));
+            if(size>usable)throw reject(INVALID_DATA,"Serialized slots exceed actual primary backpack capacity");
+        }else if(upgradeColumns!=0)throw reject(UNSUPPORTED_UPGRADE,"Column-consuming upgrade is not supported by shulker layout");
         Set<Integer> slots = new HashSet<>();
         List<Match> matches = new ArrayList<>();
         long matching = 0;
