@@ -9,3 +9,46 @@
 .DS_Store
 *.jar
 !gradle/wrapper/gradle-wrapper.jar
+
+# Private credentials and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+/secrets/
+/credentials/
+/.vscode/
+
+# Economic data, worlds and operational evidence (never publication inputs)
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+*.db
+*.db-*
+*.lock
+*.log
+*.log.gz
+/world/
+/worlds/
+/backups/
+/crash-reports/
+/server.properties
+/ops.json
+/whitelist.json
+/usercache.json
+/banned-players.json
+/banned-ips.json
+
+# Private review/delivery packages and separate development utility
+/publication-private/
+/releases/
+/dist/
+*.zip
+*.bundle
+/commerce-fixtures/
+/foundry-commerce-fixtures/

@@ -139,8 +139,8 @@ JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home \
 GRADLE_USER_HOME=/tmp/fbc-gradle-home \
 ./gradlew --offline --no-daemon --no-watch-fs \
   -I /tmp/fbc-local-repository.init.gradle \
-  -PdependencyDir=/Users/benatkinson/Developer/FoundryBulkCommerce-source/dependencies \
-  '-PcreateJar=/Users/benatkinson/Library/Application Support/PrismLauncher/instances/The Panda Foundry 2.0/minecraft/mods/create-1.21.1-6.0.10.jar' \
+  -PdependencyDir=/path/to/dependencies \
+  '-PcreateJar=/path/to/create-1.21.1-6.0.10.jar' \
   build runGameTestServer --console=plain
 ```
 

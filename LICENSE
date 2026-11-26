@@ -1,3 +1,26 @@
 Copyright (c) 2026 The Panda Foundry. All rights reserved.
 
-The authoring project and addon do not grant rights to any referenced third-party mods or Minecraft assets. Those dependencies are not included.
+This notice applies only to original Foundry: Bulk Commerce code, documentation
+and assets owned by The Panda Foundry. Public access to the source does not grant
+permission to redistribute, sublicense, relicense or publish modified versions
+of that original work. Rights not expressly granted are reserved, subject to
+applicable law and the third-party exceptions below.
+
+You may download and run official unmodified release binaries on Minecraft
+clients and servers. This permission does not grant rights to rehost those
+binaries or to distribute third-party mods. Further permissions require the
+copyright holder's written approval. GitHub platform permissions remain governed
+by the platform's terms.
+
+Third-party software, toolchain files and assets retain their respective
+copyrights and licences. In particular, this notice does not restrict any rights
+under applicable LGPL/GPL terms, including library modification, recombination
+or relinking, or reverse engineering for debugging such library modifications.
+It does not relicense or claim ownership of Minecraft, NeoForge, Treasury,
+Numismatics, Sophisticated mods, equipment APIs, Gradle or SQLite components.
+See THIRD_PARTY_NOTICES.md and licenses/ for attribution and licence texts.
+
+THE ORIGINAL FOUNDRY WORK IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+AND NONINFRINGEMENT. TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE COPYRIGHT
+HOLDERS SHALL NOT BE LIABLE FOR CLAIMS OR DAMAGES ARISING FROM ITS USE.

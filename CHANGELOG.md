@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased — publication preparation (26 November 2026)
+
+- Prepare public installation/compatibility documentation, accurate AI disclosure, contribution guidance, private security-reporting policy and issue templates.
+- Preserve third-party licence texts and identify outstanding licensing/privacy review. Remove current-machine path examples and strengthen private-data exclusions.
+- No functional source/build changes, version increment or new release tag. Production0.2.3 JAR remains unchanged.
+
 ## 0.2.3 — 26 November 2026 (BC-004)
 
 - Replace shared stack-only eligibility with explicit reviewed-class validation for ordinary Sophisticated upgrades. Preserve primary-only extraction; never sell upgrade items, ghost filters, crafting/cooking contents, fluids or energy.
