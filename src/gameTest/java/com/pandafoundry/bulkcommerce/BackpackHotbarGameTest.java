@@ -74,8 +74,8 @@ public final class BackpackHotbarGameTest {
             }
             wrapper=BackpackWrapper.fromStack(box);
             var safeRoot=BackpackStorage.get().getBackpackContents(uuid).orElseThrow().copy();
-            wrapper.getUpgradeHandler().setStackInSlot(0,new ItemStack(BuiltInRegistries.ITEM.get(net.minecraft.resources.ResourceLocation.parse("sophisticatedbackpacks:void_upgrade"))));
-            h.assertTrue(BackpackSources.collect(player,new ItemStack(Items.WHEAT)).rejections().getFirst().reason()==SaleRejection.Reason.UNSUPPORTED_UPGRADE,"Processing upgrades are excluded");checks++;
+            wrapper.getUpgradeHandler().setStackInSlot(0,new ItemStack(BuiltInRegistries.ITEM.get(net.minecraft.resources.ResourceLocation.parse("sophisticatedbackpacks:inception_upgrade"))));
+            h.assertTrue(BackpackSources.collect(player,new ItemStack(Items.WHEAT)).rejections().getFirst().reason()==SaleRejection.Reason.UNSUPPORTED_UPGRADE,"Nested inventory upgrade remains excluded");checks++;
             BackpackStorage.get().setBackpackContents(uuid,safeRoot);wrapper.onContentsNbtUpdated();
             // Movement and equipped/protected locations invalidate a previously prepared source.
             var planned=BackpackSources.collect(player,new ItemStack(Items.WHEAT)).sources().getFirst().remove(1);

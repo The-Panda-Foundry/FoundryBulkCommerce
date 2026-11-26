@@ -59,7 +59,7 @@ public final class SophisticatedSchemaTest {
         CompoundTag upgradeRoot = root.copy(), upgrades = new CompoundTag(); ListTag upgradeItems = new ListTag();
         upgradeItems.add(item(0,"minecraft:stone",1)); upgrades.putInt("Size",1); upgrades.put("Items",upgradeItems);
         upgradeRoot.getCompound("storageWrapper").getCompound("contents").put("upgradeInventory",upgrades);
-        check(!SophisticatedSources.supported(registries,upgradeRoot,27,16), "non-stack upgrade rejected");
+        check(!SophisticatedSources.supported(registries,upgradeRoot,27,16), "unregistered/non-upgrade item rejected");
         boolean underflow = false;
         try { SophisticatedSources.removeContents(registries,root,new ItemStack(Items.DIAMOND),8,27,16); }
         catch (IllegalStateException expected) { underflow = true; }

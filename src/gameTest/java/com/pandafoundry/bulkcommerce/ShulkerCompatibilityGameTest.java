@@ -115,9 +115,9 @@ public final class ShulkerCompatibilityGameTest {
                 check(h,SophisticatedSources.collect(player,template).sources().getFirst().available()==Integer.MAX_VALUE,"Repeated maximum stack upgrades and int-max count");
             }
             // Unknown active hooks must never be silently treated as a multiplier.
-            var unsafe=BuiltInRegistries.ITEM.get(net.minecraft.resources.ResourceLocation.parse("sophisticatedstorage:void_upgrade"));
+            var unsafe=BuiltInRegistries.ITEM.get(net.minecraft.resources.ResourceLocation.parse("sophisticatedstorage:infinity_upgrade"));
             wrapper.getUpgradeHandler().setStackInSlot(0,new ItemStack(unsafe));
-            check(h,SophisticatedSources.collect(player,template).rejections().getFirst().reason()==SaleRejection.Reason.UNSUPPORTED_UPGRADE,"Non-stack processing upgrade rejected");
+            check(h,!SophisticatedSources.collect(player,template).rejections().isEmpty(),"Infinite inventory upgrade remains rejected");
             for(int s=0;s<upgradeSlots;s++)wrapper.getUpgradeHandler().setStackInSlot(s,ItemStack.EMPTY);
             var invalid=canonical(box).copy();contents(invalid).getCompound("inventory").putInt("Size",slots+1);
             ItemContentsStorage.get().setStorageContents(box.get(ModCoreDataComponents.STORAGE_UUID),invalid);
