@@ -1,8 +1,8 @@
 {
-  "status": "PROPOSED / incomplete; owner approval required",
+  "status": "APPROVED route; complete pinned source archives prepared; recipient source-class rebuild and runtime tests passed; native full wrapper build environmentally blocked",
   "date": "2026-11-26",
   "Foundry_application": {
-    "revision": "f61593059b337b9acdcd4603349b59834f56cc34 plus documentation-only proposal commit",
+    "revision": "final publication-preparation commit, source archive and receipt",
     "materials": [
       "src/main including Mixins/resources/configuration",
       "build.gradle/settings.gradle/gradle.properties",
@@ -20,25 +20,18 @@
     "candidate_source_commit": "b4cbb96f5cd2fbec80fdbb2f6f3cc3abcd4f6bf5",
     "repository": "https://github.com/Layers-of-Railways/CreateNumismatics",
     "evidence": "Candidate is recorded build commit; fetched LGPL text, BankAccount source header (Copyright2023-2026 The Railways Team, LGPL3-or-later) and properties verify1.1.0/MC1.21.1. Not a reproducible-build attestation.",
-    "missing": [
-      "complete exact-source/materials acquisition and source-to-artifact verification",
-      "native build instructions/resources/mappings/dependencies and any patches",
-      "appropriate durable source availability/redistribution method",
-      "runtime transformation provenance/classification"
-    ]
+    "missing": [],
+    "validation_scope": "Complete pinned source tree and build inputs supplied; actual integration source class recompiled/tested. Full native Gradle wrapper download DNS blocked; no full native or bit-identical rebuild attestation."
   },
   "Curios": {
     "version": "9.5.1+1.21.1",
     "sha256": "a45df2125c26219974aba7507ffc9afe7b83acc941a386af3faacb1cc0056fde",
     "repository": "https://github.com/TheIllusiveC4/Curios",
     "license": "LGPL3-or-later, original copyright notice prepared",
-    "missing": [
-      "complete source archive/material acquisition and source-to-artifact verification",
-      "complete build resources/scripts and any packaging patches",
-      "durable source availability and native rebuild verification"
-    ],
+    "missing": [],
     "candidate_source_commit": "6b122c8a7e2b514fd94197459ade11f19a0bfb09",
-    "evidence": "Official1.21.1 branch history commit message9.5.1; fetched properties version9.5.1+1.21.1 and LICENSE match pinned metadata/notice. Latest branch9.6.1 is not the candidate."
+    "evidence": "Official1.21.1 branch history commit message9.5.1; fetched properties version9.5.1+1.21.1 and LICENSE match pinned metadata/notice. Latest branch9.6.1 is not the candidate.",
+    "validation_scope": "Complete pinned source tree and build inputs supplied; actual integration source class recompiled/tested. Full native Gradle wrapper download DNS blocked; no full native or bit-identical rebuild attestation."
   },
   "other_inputs": {
     "toolchain": [
@@ -69,5 +62,11 @@
     "production secrets",
     "private signing keys not actually required for this addon",
     "live inventories/bank/ledger databases"
+  ],
+  "upstream_archives_manifest": "UPSTREAM_SOURCE_ARCHIVES.json alongside sources/ in the compliance materials package",
+  "remaining_publication_obligations": [
+    "Treasury exact1.0.2 MIT/ARR clarification",
+    "actual equivalent-access publication of corresponding source/notices beside binary and availability maintenance",
+    "existing owner privacy/private-reporting activation approval"
   ]
 }

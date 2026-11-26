@@ -1,0 +1,34 @@
+--- a/build.gradle
++++ b/build.gradle
+@@ -119,7 +119,7 @@
+ tasks.named('check') { dependsOn 'integrityTest', 'compatibilityTest', 'vanillaAdapterTest', 'sophisticatedSchemaTest' }
+ 
+ def referenceHashes = [
+-    'CreateNumismatics-1.1.0+neoforge-mc1.21.1.jar': 'd33a33b46f923462ae6806a024851afaefa473ced0e95bf405f8ebc13abce767',
++    'CreateNumismatics-1.1.0+neoforge-mc1.21.1.jar': 'afe64fd9a44a848d034d9a6c839d74f09a4de6efe8632b48fa6bd6befa7fa227',
+     'numismatics_treasury-1.0.2.jar': 'fde8264ff0e17792b6160e6c41c6ea0b19e5de1343ddddcdf13b5a0bddba46e2'
+ ]
+ tasks.register('verifyCompatibilityReferences') {
+@@ -151,7 +151,7 @@
+ // All compile inputs must belong to an independently validated complete Sophisticated cohort.
+ tasks.register('verifyIntegrationReferences') {
+     def refs=[
+-        [providers.gradleProperty('curiosJar').orElse('dependencies/curios-neoforge-9.5.1+1.21.1.jar').get(),'a45df2125c26219974aba7507ffc9afe7b83acc941a386af3faacb1cc0056fde'],
++        [providers.gradleProperty('curiosJar').orElse('dependencies/curios-neoforge-9.5.1+1.21.1.jar').get(),'7bdd8a469ba3e74a051f108e8bd14e3fec55765617052167e1109cfa866bc093'],
+         [providers.gradleProperty('accessoriesJar').orElse('dependencies/accessories-neoforge-1.1.0-beta.53+1.21.1.jar').get(),'10017a3da78ea63e9ece27a1ca32f8cf490362f348778cf8cb759e7282f3beb0']
+     ]
+     inputs.files(refs.collect { file(it[0]) }+[file(coreJar.get()),file(storageJar.get()),file(backpackJar.get())])
+--- a/src/main/java/com/pandafoundry/bulkcommerce/RuntimeCompatibility.java
++++ b/src/main/java/com/pandafoundry/bulkcommerce/RuntimeCompatibility.java
+@@ -27,9 +27,9 @@
+     }
+     public static Runnable verifier() {
+         Map<String,String> fixed=new LinkedHashMap<>();
+-        fixed.put("numismatics","d33a33b46f923462ae6806a024851afaefa473ced0e95bf405f8ebc13abce767");
++        fixed.put("numismatics","afe64fd9a44a848d034d9a6c839d74f09a4de6efe8632b48fa6bd6befa7fa227");
+         fixed.put("numismatics_treasury","fde8264ff0e17792b6160e6c41c6ea0b19e5de1343ddddcdf13b5a0bddba46e2");
+-        if(ModList.get().isLoaded("curios"))fixed.put("curios","a45df2125c26219974aba7507ffc9afe7b83acc941a386af3faacb1cc0056fde");
++        if(ModList.get().isLoaded("curios"))fixed.put("curios","7bdd8a469ba3e74a051f108e8bd14e3fec55765617052167e1109cfa866bc093");
+         if(ModList.get().isLoaded("accessories"))fixed.put("accessories","10017a3da78ea63e9ece27a1ca32f8cf490362f348778cf8cb759e7282f3beb0");
+         Map<String,Path> paths=new LinkedHashMap<>();
+         fixed.keySet().forEach(id->paths.put(id,modPath(id)));

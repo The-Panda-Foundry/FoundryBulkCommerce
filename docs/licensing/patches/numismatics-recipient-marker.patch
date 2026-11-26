@@ -1,0 +1,38 @@
+--- common/src/main/java/dev/ithundxr/createnumismatics/content/backend/BankAccount.java
++++ common/src/main/java/dev/ithundxr/createnumismatics/content/backend/BankAccount.java
+@@ -32,8 +32,8 @@
+ import dev.ithundxr.createnumismatics.util.Utils;
+ import net.createmod.catnip.nbt.NBTHelper;
+ import net.createmod.catnip.platform.CatnipServices;
+-import net.fabricmc.api.EnvType;
+-import net.fabricmc.api.Environment;
++import net.neoforged.api.distmarker.Dist;
++import net.neoforged.api.distmarker.OnlyIn;
+ import net.minecraft.core.HolderLookup;
+ import net.minecraft.nbt.CompoundTag;
+ import net.minecraft.nbt.Tag;
+@@ -64,6 +64,9 @@
+ import static dev.ithundxr.createnumismatics.Numismatics.crashDev;
+ 
+ public class BankAccount implements MenuProvider, IDeductable, IAuthorizationChecker {
++    // Recipient validation only: harmless source change; 26 November 2026.
++    public static String foundryRecipientMarker() { return "numismatics-source-rebuild"; }
++
+     private static final int MAX_STANDARD_BALANCE = Integer.MAX_VALUE >> 1; // leave a bit of margin
+ 
+     public enum Type {
+@@ -539,12 +542,12 @@
+         );
+     }
+ 
+-    @Environment(EnvType.CLIENT)
++    @OnlyIn(Dist.CLIENT)
+     public void openSubAccountsMenu() {
+         CatnipServices.NETWORK.sendToServer(new OpenSubAccountsMenuPacket(this));
+     }
+ 
+-    @Environment(EnvType.CLIENT)
++    @OnlyIn(Dist.CLIENT)
+     public void openNormalMenu() {
+         CatnipServices.NETWORK.sendToServer(new OpenSubAccountsMenuPacket(this, false));
+     }

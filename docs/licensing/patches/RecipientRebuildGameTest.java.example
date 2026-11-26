@@ -1,0 +1,17 @@
+package com.pandafoundry.bulkcommerce;
+import net.minecraft.gametest.framework.*;
+import net.neoforged.neoforge.gametest.*;
+@GameTestHolder("foundrybulkcommerce") @PrefixGameTestTemplate(false)
+public final class RecipientRebuildGameTest {
+ @GameTest(template="empty",batch="lgpl-recipient",timeoutTicks=10000)
+ public static void sourceRebuiltLibraries(GameTestHelper h) {
+  h.startSequence().thenWaitUntil(()->h.assertTrue(com.pandafoundry.bulkcommerce.ledger.LedgerRuntime.admissionOpen(),"Rebuilt exact references accepted by ledger startup"))
+   .thenExecute(()->{
+    try {
+     h.assertTrue("numismatics-source-rebuild".equals(dev.ithundxr.createnumismatics.content.backend.BankAccount.class.getMethod("foundryRecipientMarker").invoke(null)),"Actually loaded recompiled Numismatics source");
+     h.assertTrue("curios-source-rebuild".equals(top.theillusivec4.curios.api.CuriosApi.class.getMethod("foundryRecipientMarker").invoke(null)),"Actually loaded recompiled Curios source");
+     FoundryBulkCommerce.LOGGER.info("[LGPL recipient] Both authored-source library markers loaded; strict replacement digests accepted; original transaction suite follows");
+    }catch(ReflectiveOperationException e){throw new IllegalStateException(e);}
+   }).thenSucceed();
+ }
+}

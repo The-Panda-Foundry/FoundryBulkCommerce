@@ -1,48 +1,55 @@
-# Recipient rebuild procedure — proposed, not executed
+# Demonstrated recipient rebuild procedure
 
-26 November2026. **Conditional on adoption of the proposed permission and provision of complete corresponding materials.** This is an engineering recipe for owner review; it is not a verified end-to-end modified-library build or permission currently granted by the active ARR text. No production files should be used.
+26 November2026. Approved application-recombination permission is in LICENSE. Official fingerprints and transaction code remain unchanged. This document records a **source-class rebuild and runtime recombination**, not a successful clean full-native-project Gradle build.
 
-## 1. Inputs
+## Source and inputs
 
-Obtain the exact release source revision and corresponding-source package, Java21, Gradle9.2.1 wrapper, ModDevGradle2.0.148, Minecraft1.21.1 mappings/runtime, NeoForge21.1.265 for the recorded test environment, and all native compile references listed in build.gradle. Keep untouched copies of official JARs and data. Download non-redistributed dependencies from their lawful sources; do not infer rights to publish Sophisticated/Treasury JARs from the Foundry exception. Optional integrations are runtime optional but their API references are compile inputs in this source tree.
+Use the accompanying exact-source archives for Numismatics b4cbb96f5cd2fbec80fdbb2f6f3cc3abcd4f6bf5 and Curios6b122c8a7e2b514fd94197459ade11f19a0bfb09, plus the matching complete Foundry source archive. Every777 Numismatics and248 Curios tracked file is included; archive bytes are checked against Git blob IDs. Native build scripts, wrappers, source, resources, copyright and supplied licence files are retained. Archives are pristine; modifications are separate patches. SHA256/version manifests identify the binaries, sources and test changes. No production database, secret or signing credential is required.
 
-For an unchanged-source reproduction, use the original exact cohort and economy/equipment references. `./gradlew build` invokes the executable regression harnesses. `./gradlew -PcreateJar=/path/to/create-1.21.1-6.0.10.jar -PwithCurios -PwithAccessories -PowoJar=/path/to/owo-lib.jar runGameTestServer` exercises the actual integrations. Put exact compile references in dependencies/ or supply the documented -P paths. A populated cache permits --offline; a clean machine needs lawful network access to the recorded repositories. The previous private /tmp SQLite Maven override is an environmental cache workaround, not a required undisclosed source input: standard build.gradle resolves org.xerial:sqlite-jdbc:3.51.3.0 from Maven Central. Clean-machine dependency resolution remains to be demonstrated. Verify Gradle/plugin/artifact provenance; do not require private credentials or local absolute paths.
+Obtain Java21 and the original pinned native binaries/compile references lawfully, including Create6.0.10 and the coherent Sophisticated cohort. Original non-LGPL dependency JARs are not redistributed. Use the original reference filenames in the recipient dependency directory to match the existing build selection. Use normal Gradle repositories/caches; no proprietary build key is required.
 
-## 2. Build the modified LGPL library
+## 1. Establish the Java21 classpath
 
-Pinned candidate source acquisition (instructions only; repositories/builds were not cloned/executed by this task):
+From a disposable copy of the Foundry source, run its Gradle9.2.1 wrapper with the existing documented dependency path properties and runtime test dependencies, adding:
 
 ```sh
-git clone https://github.com/Layers-of-Railways/CreateNumismatics.git numismatics-source
-git -C numismatics-source checkout --detach b4cbb96f5cd2fbec80fdbb2f6f3cc3abcd4f6bf5
-git clone https://github.com/TheIllusiveC4/Curios.git curios-source
-git -C curios-source checkout --detach 6b122c8a7e2b514fd94197459ade11f19a0bfb09
+./gradlew -I docs/licensing/RECIPIENT_CLASSPATH.init.gradle \
+  -PcreateJar=/path/to/create-1.21.1-6.0.10.jar \
+  -PwithCurios -PwithAccessories -PowoJar=/path/to/owo-lib.jar \
+  writeRecipientClasspaths
 ```
 
-Preserve all required submodules/generated-input provenance and packaging changes. At those candidates Numismatics selects NeoForge21.1.228/Create6.0.10-280 and Curios selects NeoForge21.1.60; these native build toolchains differ from the addon test runtime21.1.265 and must be reproduced rather than silently replaced. Expected native build entry points are the projects' Gradle wrappers (Numismatics' NeoForge module, Curios' root build); verify their actual documented tasks/configuration before recording a successful recipe. Do not substitute latest branch heads. Candidate version metadata is evidence, not proof that the distributed JAR has no additional build inputs.
+This writes build/recipient/compile-classpath.txt. As for the normal build, supply -PdependencyDir, -PcoreJar, -PstorageJar, -PbackpacksJar, -PcuriosJar and -PaccessoriesJar when references are not under dependencies/. Retain their original exact digests while preparing the initial classpath. Add the normal Create embedded Ponder/Catnip library to the classpath: extract META-INF/jarjar/ponder-neoforge-1.0.82+mc1.21.1.jar from the lawful Create6.0.10 JAR into a temporary directory. The recorded run also supplied its embedded Flywheel/Registrate JARs. These are external native build inputs, not supplied redistribution payloads. The exported path list plus these entries is the `RECIPIENT_CP` below; use the platform path separator (colon on macOS/Linux). No server-thread/database operation participates.
 
+## 2. Apply and compile actual authored source changes
 
-Start from the pinned native source commit/archive with its own build scripts/resources and licence; record your modification and its date. Build for MC1.21.1/NeoForge and the expected public interfaces. Source completeness/native reproduction must be confirmed before this procedure can be labelled reproducible. An API-compatible metadata-only modification is a useful first test, followed by a small genuine library source change. General library-modification rights are not limited to those examples.
+Apply patches/numismatics-recipient-marker.patch from the Numismatics source root and patches/curios-recipient-marker.patch from the Curios root (`patch -p0 < /path/to/the.patch`). Each adds only a public marker method. The Numismatics patch also maps the common-source Fabric Environment/EnvType annotation to the matching NeoForge OnlyIn/Dist annotation, preserving client-only scope as in the native NeoForge artifact. These are genuine authored upstream sources, not decompiled or fabricated API stubs. Preserve upstream headers and the modification/date comments in the patches.
 
-## 3. Recombine your application copy
+```sh
+javac --release 21 -proc:none -encoding UTF-8 -classpath "$RECIPIENT_CP" \
+  -d /path/to/numismatics-classes \
+  /path/to/numismatics-source/common/src/main/java/dev/ithundxr/createnumismatics/content/backend/BankAccount.java
+javac --release 21 -proc:none -encoding UTF-8 -classpath "$RECIPIENT_CP" \
+  -d /path/to/curios-classes \
+  /path/to/curios-source/neoforge/src/main/java/top/theillusivec4/curios/api/CuriosApi.java
+python3 docs/licensing/recipient_overlay.py /path/to/original-numismatics.jar \
+  /path/to/numismatics-classes /path/to/recipient-dependencies/CreateNumismatics-1.1.0+neoforge-mc1.21.1.jar
+python3 docs/licensing/recipient_overlay.py /path/to/original-curios.jar \
+  /path/to/curios-classes /path/to/recipient-dependencies/curios-neoforge-9.5.1+1.21.1.jar
+```
 
-Compute the replacement JAR's complete SHA256 (`shasum -a 256 /path/to/replacement.jar` or `sha256sum`). In a **separate recipient source copy**, update only the exact expected references for the LGPL components you intentionally replaced:
+The overlay retains every unaffected archive entry, including native metadata and notices, and replaces the source-compiled class family. The original JAR is never overwritten. Copy the unchanged Treasury reference into the recipient dependency directory. This scoped demonstration does not rebuild all other native classes. For a full native rebuild use the complete upstream projects and their wrappers/tasks, rather than claiming this overlay is such a build. Source modification rights are not limited to these marker examples.
 
-| Component | Compile-time check | Runtime check |
-| --- | --- | --- |
-| Numismatics | build.gradle referenceHashes entry for CreateNumismatics-1.1.0+neoforge-mc1.21.1.jar | RuntimeCompatibility.verifier fixed numismatics digest |
-| Curios | build.gradle verifyIntegrationReferences Curios digest | RuntimeCompatibility.verifier fixed curios digest |
+## 3. Rebuild the recipient application with exact replacement references
 
-Preserve every unrelated fingerprint/cohort check. Keep replacement interfaces/version metadata compatible or explicitly adapt metadata/API bindings in the recipient copy; do not merely suppress failing Mixin/accessor tests. Retaining original dependency filenames is the simplest path through existing file selection; changing them requires updating the relevant build file selection and test inputs too. Replacement library version strings must satisfy metadata ranges in META-INF/neoforge.mods.toml or be deliberately adapted in that copy. A digest match alone is not compatibility proof.
+Compute each new JAR's SHA256. Change the Numismatics and Curios expected digests only in **your copy** of build.gradle and RuntimeCompatibility.java. The supplied recipient-application-exact-digests.patch records the demonstrated output hashes, not a universal hash for other compiler outputs: substitute your actual hashes if they differ. Recompression/timestamps and other build inputs can change digests without changing API semantics. Retain all unrelated pins, arithmetic, hotbar, identity, extraction, ledger and compensation checks. There is no official wildcard/bypass option.
 
-No script or auto-patch changing these files is installed in the official repository by this proposal. The recipient recompiles their copy; the official binary remains strict. Leave quantity/payment/extraction/ledger/identity safeguards intact when making a compatibility-only fork. If a lawful library change needs a broader application adaptation, the proposed permission covers what is necessary rather than forcing a no-change API assumption.
+Run Java21 `./gradlew build runGameTestServer` with the same exact dependency properties, now selecting recipient dependencies and the modified Curios JAR. To verify the added source methods loaded, copy patches/RecipientRebuildGameTest.java.example into the recipient src/gameTest package as RecipientRebuildGameTest.java. The recorded run passed2424 executable checks and13 required actual GameTests, including both marker checks, native equipment/containers, transaction payment and ledger cases. It ran on macOS/NeoForge21.1.265 in a disposable world, not a live server. Keep logs/modification records and provide adopted permissions/source materials when conveying recombinations. Identify forks accurately, without implying upstream/Foundry endorsement. Do not impose an official-approval requirement on these rights.
 
-## 4. Build, test and install in disposable staging
+## 4. Negative verification and upstream wrapper limit
 
-Run Java21 `./gradlew clean build` and relevant actual-mod GameTests using the replacement library. Preserve exact API/guard tests, rollback and ledger checks. Exercise integrated and dedicated startup, actual replacement class loading, hotbar/protected contents, aliases, partial/Omega extraction, payment, native storage persistence and manual-recovery containment. Do not mark skipped optional tests as active coverage. A deliberately unknown second digest must still be rejected. Save the modification diff, toolchain/dependency manifest, compile/test logs and resulting hashes. Install only the recipient addon and compatible replacement dependencies in a disposable world; never run different authoritative copies against a shared production ledger.
+In the disposable recipient copy only, restored original RuntimeCompatibility source was tested first with modified Numismatics, then with original Numismatics plus modified Curios. Each isolated one-test headless server rejected the respective digest, left ledger/player/transaction admission closed, and passed the failure-containment assertion. These are two independent runtime checks, not merely calculated hash inequalities. No unknown library was accepted by the official verifier.
 
-No host signature/secret is currently required to load an independently compiled addon. Installation information for a supplied User Product, if applicable, must be sufficient; public build instructions alone cannot substitute for a required unavailable key. Identify recipient builds as modified/unofficial, retain relevant notices and provide required materials/permissions to subsequent recipients. No new official release tag or binary is created by this guide.
+Full upstream wrappers were retried26 November2026: Curios requires Gradle8.8 and Numismatics8.12; both stopped at UnknownHostException for services.gradle.org because these distributions are uncached. No full native Gradle build or bit-identical native artifact reproduction is claimed. On a normally connected machine, use the complete supplied native wrapper projects and their documented :neoforge:build tasks; no publish/upload task is necessary. Native toolchain versions differ from the addon test runtime and are retained in their build files. This environmental limitation does not erase the demonstrated source-class/recombination result.
 
-## Acceptance before claiming a working section4(d)(0) route
-
-A fresh recipient must be able to acquire all necessary materials, build the library and addon, load the recombined runtime, exercise transactions and retain downstream rights without asking for per-build permission. The proposal has not performed that demonstration. Current legal/source-material obstacles are in PROPOSAL.md and SOURCE_MATERIALS.json.
+The final materials package includes pristine upstream/application source, source patches, complete licences, manifests and validation evidence. Beside any approved binary download, publish equivalent no-charge source access directions and maintain availability. Treasury clarification remains pending; no new official binary or publication is authorized by this procedure.

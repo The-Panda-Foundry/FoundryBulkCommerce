@@ -1,0 +1,12 @@
+--- neoforge/src/main/java/top/theillusivec4/curios/api/CuriosApi.java
++++ neoforge/src/main/java/top/theillusivec4/curios/api/CuriosApi.java
+@@ -55,6 +55,9 @@
+ import top.theillusivec4.curios.api.type.util.ISlotHelper;
+ 
+ public final class CuriosApi {
++    // Recipient validation only: harmless source change; 26 November 2026.
++    public static String foundryRecipientMarker() { return "curios-source-rebuild"; }
++
+ 
+   private static final Logger LOGGER = LogUtils.getLogger();
+ 

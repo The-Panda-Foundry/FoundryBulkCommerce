@@ -1,3 +1,5 @@
+**Implementation update26 November2026:** Owner approved this route. The root LICENSE now contains the operative application exception and additional LGPL3-or-later grant for accessor material. This earlier proposal is retained as decision history; draft/incomplete status statements below are superseded by VALIDATION_2026-11-26.md, REBUILDING.md and SOURCE_MATERIALS.json. No claim of a full native wrapper build is made.
+
 # Proposed ARR / LGPL3 section4(d)(0) compliance route
 
 26 November2026. **DRAFT FOR OWNER APPROVAL. Not adopted licence terms, not legal clearance.** Official version0.2.3, transaction behaviour and strict native fingerprints remain unchanged. No binary is built/released by this proposal.

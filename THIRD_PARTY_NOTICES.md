@@ -41,3 +41,7 @@ Authoritative reference: https://www.gnu.org/licenses/lgpl-3.0-standalone.html .
 ## Proposed licensing resolution,26 November2026
 
 Complete GPL3/LGPL3 texts and the exact Curios copyright notice are prepared in licenses/. This does not relicense original Foundry work or establish a completed compliance route. See docs/licensing/PROPOSAL.md, PROPOSED_EXCEPTION.md and SOURCE_MATERIALS.json. Active LICENSE is unchanged pending approval. Exact Treasury1.0.2 version-page evidence and an unsent developer request are in docs/licensing/TREASURY_CLARIFICATION_REQUEST.md. Recovered prior review: docs/RECOVERED_FINAL_REVIEW_2026-11-26.md.
+
+## Approved source-recombination route —26 November2026
+
+The root LICENSE now adopts the approved ARR application exception; original BankAccountAccessor/injected accessor definitions are additionally LGPL3-or-later. Complete pinned library sources/build files, copyright/MIT notices, GPL3/LGPL3 texts, patches and recipient instructions accompany the compliance materials. Source-class rebuild/recombination passed2424 checks and13 runtime GameTests; two official-verifier negative tests failed closed as expected. Full native wrappers could not download uncached Gradle due DNS. See docs/licensing/VALIDATION_2026-11-26.md. Earlier proposed/draft references above are historical, not the current licence status. Required source/notice access must actually accompany any approved distribution. Treasury clarification remains unsent/unresolved.

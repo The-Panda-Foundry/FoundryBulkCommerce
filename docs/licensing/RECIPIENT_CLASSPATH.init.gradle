@@ -1,0 +1,9 @@
+allprojects {
+ tasks.register('writeRecipientClasspaths') {
+  doLast {
+   def target=layout.buildDirectory.file('recipient/compile-classpath.txt').get().asFile
+   target.parentFile.mkdirs()
+   target.text=(sourceSets.main.compileClasspath+sourceSets.gameTest.runtimeClasspath).asPath
+  }
+ }
+}
